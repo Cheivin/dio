@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	code "github.com/cheivin/dio/errors"
+	"github.com/cheivin/dio/errors"
 	"github.com/cheivin/dio/system"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -11,16 +11,16 @@ import (
 type WebRecover struct {
 	Web        *gin.Engine `aware:"web"`
 	Log        *system.Log `aware:"log"`
-	responseFn func(c *gin.Context, err code.Error)
+	responseFn func(c *gin.Context, err errors.Error)
 }
 
 func (w *WebRecover) BeanConstruct() {
-	w.responseFn = func(c *gin.Context, err code.Error) {
+	w.responseFn = func(c *gin.Context, err errors.Error) {
 		c.String(err.Code, err.Error())
 	}
 }
 
-func (w *WebRecover) SetErrorHandler(fn func(c *gin.Context, err code.Error)) {
+func (w *WebRecover) SetErrorHandler(fn func(c *gin.Context, err errors.Error)) {
 	w.responseFn = fn
 }
 
@@ -31,28 +31,28 @@ func (w *WebRecover) AfterPropertiesSet() {
 }
 
 func (w *WebRecover) noRoute(c *gin.Context) {
-	w.responseFn(c, code.NoRoute)
+	w.responseFn(c, errors.NoRoute)
 }
 
 func (w *WebRecover) noMethod(c *gin.Context) {
-	w.responseFn(c, code.NoMethod)
+	w.responseFn(c, errors.NoMethod)
 }
 
 func (w *WebRecover) recover(c *gin.Context) {
 	defer func() {
 		if r := recover(); r != nil {
 			switch r.(type) {
-			case code.Error:
-				err := r.(code.Error)
+			case errors.Error:
+				err := r.(errors.Error)
 				_ = c.Error(&err)
 				w.responseFn(c, err)
 			case error:
 				e := r.(error)
-				err := code.Err(http.StatusInternalServerError, e.Error(), e)
+				err := errors.Err(http.StatusInternalServerError, e.Error(), e)
 				_ = c.Error(&err)
 				w.responseFn(c, err)
 			case string:
-				err := code.ErrMsg(http.StatusInternalServerError, r.(string))
+				err := errors.ErrMsg(http.StatusInternalServerError, r.(string))
 				_ = c.Error(&err)
 				w.responseFn(c, err)
 			default:
