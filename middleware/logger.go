@@ -21,7 +21,9 @@ func (w *WebLogger) BeanConstruct() {
 	skipPaths := strings.Split(w.Skips, ",")
 	w.skip = make(map[string]struct{}, len(skipPaths))
 	for _, path := range skipPaths {
-		w.skip[path] = struct{}{}
+		if path != "" {
+			w.skip[path] = struct{}{}
+		}
 	}
 }
 
