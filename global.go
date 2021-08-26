@@ -37,8 +37,16 @@ func Provide(prototype interface{}) *dio {
 	return g.Provide(prototype)
 }
 
-func ProvideWithBeanName(beanName string, prototype interface{}) *dio {
-	return g.ProvideWithBeanName(beanName, prototype)
+func ProvideNamedBean(beanName string, prototype interface{}) *dio {
+	return g.ProvideNamedBean(beanName, prototype)
+}
+
+func ProvideOnProperty(prototype interface{}, property string, compareValue string) *dio {
+	return g.ProvideOnProperty(prototype, property, compareValue)
+}
+
+func ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string) *dio {
+	return g.ProvideNamedBeanOnProperty(beanName, prototype, property, compareValue)
 }
 
 func GetBean(beanName string) (bean interface{}, ok bool) {

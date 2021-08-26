@@ -2,6 +2,7 @@ package dio
 
 import (
 	"context"
+	"fmt"
 	"github.com/cheivin/di"
 	"github.com/cheivin/dio/internal/mysql"
 	"github.com/cheivin/dio/internal/web"
@@ -19,8 +20,21 @@ type dio struct {
 	loaded        bool
 }
 type bean struct {
-	name     string
-	instance interface{}
+	name         string
+	instance     interface{}
+	property     string
+	compareValue string
+}
+
+func (b bean) matchProperty() bool {
+	if b.property == "" {
+		return true
+	}
+	val := di.Property().Get(b.property)
+	if val == nil {
+		return b.compareValue == ""
+	}
+	return fmt.Sprintf("%v", val) == b.compareValue
 }
 
 var g *dio
@@ -81,18 +95,30 @@ func (d *dio) RegisterNamedBean(name string, bean interface{}) *dio {
 }
 
 func (d *dio) Provide(prototype interface{}) *dio {
-	d.ProvideWithBeanName("", prototype)
+	d.ProvideNamedBean("", prototype)
 	return d
 }
 
-func (d *dio) ProvideWithBeanName(beanName string, prototype interface{}) *dio {
+func (d *dio) ProvideNamedBean(beanName string, prototype interface{}) *dio {
+	return d.ProvideNamedBeanOnProperty(beanName, prototype, "", "")
+}
+
+func (d *dio) ProvideOnProperty(prototype interface{}, property string, compareValue string) *dio {
+	return d.ProvideNamedBeanOnProperty("", prototype, property, compareValue)
+}
+
+func (d *dio) ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string) *dio {
 	if g.loaded {
 		panic("dio is already run")
 	}
-	g.providedBeans = append(g.providedBeans, bean{name: beanName, instance: prototype})
+	g.providedBeans = append(g.providedBeans,
+		bean{name: beanName,
+			instance:     prototype,
+			property:     property,
+			compareValue: compareValue,
+		})
 	return d
 }
-
 func (d *dio) GetBean(beanName string) (bean interface{}, ok bool) {
 	return di.GetBean(beanName)
 }
@@ -105,7 +131,9 @@ func (d *dio) Run(ctx context.Context) {
 	defer stop()
 	for i := range g.providedBeans {
 		beanDefinition := g.providedBeans[i]
-		di.ProvideWithBeanName(beanDefinition.name, beanDefinition.instance)
+		if beanDefinition.matchProperty() {
+			di.ProvideWithBeanName(beanDefinition.name, beanDefinition.instance)
+		}
 	}
 	di.LoadAndServ(ctx)
 }
