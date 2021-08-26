@@ -7,13 +7,11 @@ import (
 	"github.com/cheivin/dio/system"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strings"
 	"time"
 )
 
 type Container struct {
 	Port   int         `value:"app.port"`
-	Env    string      `value:"app.env"`
 	Log    *system.Log `aware:"log"`
 	router *gin.Engine
 	server *http.Server
@@ -25,14 +23,6 @@ func (w *Container) BeanName() string {
 
 // BeanConstruct 初始化实例时，创建gin框架
 func (w *Container) BeanConstruct() {
-	switch strings.ToLower(w.Env) {
-	case "prod":
-		gin.SetMode(gin.ReleaseMode)
-	case "test":
-		gin.SetMode(gin.TestMode)
-	default:
-		gin.SetMode(gin.DebugMode)
-	}
 	w.router = gin.New()
 	w.router.RemoteIPHeaders = []string{"X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"}
 	// 注册gin到容器

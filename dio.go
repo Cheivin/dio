@@ -113,7 +113,6 @@ func (d *dio) Run(ctx context.Context) {
 func (d *dio) Web(useLogger, useCors bool) *dio {
 	di.SetDefaultPropertyMap(map[string]interface{}{
 		"app.port": 8080,
-		"app.env":  "dev",
 	})
 	di.Provide(web.Container{})
 	di.Provide(middleware.WebRecover{})

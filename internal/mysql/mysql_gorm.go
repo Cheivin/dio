@@ -16,7 +16,6 @@ func SetOptions(options ...gorm.Option) {
 }
 
 type GormConfiguration struct {
-	Env         string `value:"app.env"`
 	Username    string `value:"mysql.username"`
 	Password    string `value:"mysql.password"`
 	Host        string `value:"mysql.host"`
