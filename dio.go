@@ -24,17 +24,26 @@ type bean struct {
 	instance     interface{}
 	property     string
 	compareValue string
+	needMatch    bool
 }
 
-func (b bean) matchProperty() bool {
+func (b bean) matchProperty() (match bool) {
+	// 空值表示未设定条件
 	if b.property == "" {
 		return true
 	}
+	// 取出比较的属性值
 	val := di.Property().Get(b.property)
 	if val == nil {
-		return b.compareValue == ""
+		match = b.compareValue == ""
+	} else {
+		match = fmt.Sprintf("%v", val) == b.compareValue
 	}
-	return fmt.Sprintf("%v", val) == b.compareValue
+	if b.needMatch {
+		return match
+	} else {
+		return !match
+	}
 }
 
 var g *dio
@@ -116,9 +125,29 @@ func (d *dio) ProvideNamedBeanOnProperty(beanName string, prototype interface{},
 			instance:     prototype,
 			property:     property,
 			compareValue: compareValue,
+			needMatch:    true,
 		})
 	return d
 }
+
+func (d *dio) ProvideNotOnProperty(prototype interface{}, property string, compareValue string) *dio {
+	return d.ProvideNamedBeanNotOnProperty("", prototype, property, compareValue)
+}
+
+func (d *dio) ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string) *dio {
+	if g.loaded {
+		panic("dio is already run")
+	}
+	g.providedBeans = append(g.providedBeans,
+		bean{name: beanName,
+			instance:     prototype,
+			property:     property,
+			compareValue: compareValue,
+			needMatch:    false,
+		})
+	return d
+}
+
 func (d *dio) GetBean(beanName string) (bean interface{}, ok bool) {
 	return di.GetBean(beanName)
 }

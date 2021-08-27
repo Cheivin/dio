@@ -49,6 +49,14 @@ func ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property
 	return g.ProvideNamedBeanOnProperty(beanName, prototype, property, compareValue)
 }
 
+func ProvideNotOnProperty(prototype interface{}, property string, compareValue string) *dio {
+	return g.ProvideNotOnProperty(prototype, property, compareValue)
+}
+
+func ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string) *dio {
+	return g.ProvideNamedBeanNotOnProperty(beanName, prototype, property, compareValue)
+}
+
 func GetBean(beanName string) (bean interface{}, ok bool) {
 	return g.GetBean(beanName)
 }
