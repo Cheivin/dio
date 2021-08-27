@@ -10,9 +10,9 @@ import (
 )
 
 type GormLogger struct {
-	Level                     int         `value:"mysql.Log.level"`
-	SlowThreshold             string      `value:"mysql.Log.slow-log"`
-	IgnoreRecordNotFoundError bool        `value:"mysql.Log.ignore-notfound"`
+	Level                     int         `value:"mysql.log.level"`
+	SlowThreshold             string      `value:"mysql.log.slow-log"`
+	IgnoreRecordNotFoundError bool        `value:"mysql.log.ignore-notfound"`
 	Log                       *system.Log `aware:"log"`
 
 	slowThreshold time.Duration
