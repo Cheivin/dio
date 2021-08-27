@@ -4,6 +4,7 @@ import (
 	"github.com/cheivin/dio/system"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
+	"net/http"
 	"strings"
 	"time"
 )
@@ -32,6 +33,12 @@ func (w *WebLogger) AfterPropertiesSet() {
 }
 
 func (w *WebLogger) log(c *gin.Context) {
+	defer func() {
+		// 此处recover用于处理顶层log中间件写出日志panic
+		if r := recover(); r != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+		}
+	}()
 	// 开始时间
 	start := time.Now()
 	path := c.Request.URL.Path

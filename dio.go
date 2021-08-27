@@ -172,7 +172,6 @@ func (d *dio) Web(useLogger, useCors bool) *dio {
 		"app.port": 8080,
 	})
 	di.Provide(web.Container{})
-	di.Provide(middleware.WebRecover{})
 	if useLogger {
 		di.SetDefaultProperty("app.web.log", map[string]interface{}{
 			"skip-path":  "",
@@ -180,6 +179,7 @@ func (d *dio) Web(useLogger, useCors bool) *dio {
 		})
 		di.Provide(middleware.WebLogger{})
 	}
+	di.Provide(middleware.WebRecover{})
 	if useCors {
 		di.SetDefaultProperty("app.web.cors", map[string]interface{}{
 			"origin":            "",
