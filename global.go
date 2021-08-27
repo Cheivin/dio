@@ -17,6 +17,10 @@ func SetProperty(key string, value interface{}) *dio {
 	return g.SetProperty(key, value)
 }
 
+func GetPropertyString(key string) string {
+	return g.GetPropertyString(key)
+}
+
 func SetPropertyMap(properties map[string]interface{}) *dio {
 	return g.SetPropertyMap(properties)
 }

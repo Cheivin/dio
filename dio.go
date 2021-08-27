@@ -87,6 +87,15 @@ func (d *dio) SetPropertyMap(properties map[string]interface{}) *dio {
 	return d
 }
 
+func (d *dio) GetPropertyString(property string) string {
+	val := di.Property().Get(property)
+	if val == nil {
+		return ""
+	} else {
+		return fmt.Sprintf("%v", val)
+	}
+}
+
 func (d *dio) AutoMigrateEnv() *dio {
 	envMap := di.LoadEnvironment(strings.NewReplacer("_", "."), false)
 	di.SetPropertyMap(envMap)
