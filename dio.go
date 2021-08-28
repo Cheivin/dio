@@ -170,7 +170,7 @@ func (d *dio) Run(ctx context.Context) {
 	for i := range g.providedBeans {
 		beanDefinition := g.providedBeans[i]
 		if beanDefinition.matchProperty() {
-			di.ProvideWithBeanName(beanDefinition.name, beanDefinition.instance)
+			di.ProvideNamedBean(beanDefinition.name, beanDefinition.instance)
 		}
 	}
 	di.LoadAndServ(ctx)
