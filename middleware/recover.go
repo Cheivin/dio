@@ -31,10 +31,12 @@ func (w *WebRecover) AfterPropertiesSet() {
 }
 
 func (w *WebRecover) noRoute(c *gin.Context) {
+	_ = c.Error(errors.NoRoute.Cause())
 	w.responseFn(c, errors.NoRoute)
 }
 
 func (w *WebRecover) noMethod(c *gin.Context) {
+	_ = c.Error(errors.NoMethod.Cause())
 	w.responseFn(c, errors.NoMethod)
 }
 
