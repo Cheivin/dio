@@ -11,11 +11,12 @@ import (
 
 // WebLogger 日志
 type WebLogger struct {
-	Web       *gin.Engine `aware:"web"`
-	Log       *system.Log `aware:"log"`
-	Skips     string      `value:"app.web.log.skip-path"`
-	TraceName string      `value:"app.web.log.trace-name"`
-	skip      map[string]struct{}
+	Web         *gin.Engine `aware:"web"`
+	Log         *system.Log `aware:"log"`
+	Skips       string      `value:"app.web.log.skip-path"`
+	TraceName   string      `value:"app.web.log.trace-name"`
+	skip        map[string]struct{}
+	idGenerator func(c *gin.Context) string
 }
 
 func (w *WebLogger) BeanConstruct() {
@@ -26,6 +27,13 @@ func (w *WebLogger) BeanConstruct() {
 			w.skip[path] = struct{}{}
 		}
 	}
+	w.idGenerator = func(_ *gin.Context) string {
+		return uuid.NewV4().String()
+	}
+}
+
+func (w *WebLogger) SetIdGenerator(idGenerator func(c *gin.Context) string) {
+	w.idGenerator = idGenerator
 }
 
 func (w *WebLogger) AfterPropertiesSet() {
@@ -50,7 +58,7 @@ func (w *WebLogger) log(c *gin.Context) {
 		reqId = c.GetHeader(w.TraceName)
 	}
 	if reqId == "" {
-		reqId = uuid.NewV4().String()
+		reqId = w.idGenerator(c)
 		c.Header(w.TraceName, reqId)
 	}
 	c.Set(w.Log.TraceName, reqId)
