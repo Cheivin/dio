@@ -200,7 +200,7 @@ func (d *dio) Web(useLogger, useCors bool) *dio {
 		})
 		di.Provide(middleware.WebCors{})
 	}
-
+	di.Provide(web.Controller{})
 	return d
 }
 
