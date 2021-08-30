@@ -1,8 +1,8 @@
 package system
 
 import (
-	"net/http"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type Controller struct {
@@ -12,31 +12,45 @@ type Controller struct {
 
 func (o *Controller) JsonView(fn func(*gin.Context) interface{}) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, fn(c))
+		data := fn(c)
+		if !c.IsAborted() {
+			c.JSON(http.StatusOK, data)
+		}
 	}
 }
 
 func (o *Controller) HtmlView(fn func(*gin.Context) (string, gin.H)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		view, data := fn(c)
-		c.HTML(http.StatusOK, view, data)
+		if !c.IsAborted() {
+			c.HTML(http.StatusOK, view, data)
+		}
 	}
 }
 
 func (o *Controller) XmlView(fn func(*gin.Context) interface{}) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.XML(http.StatusOK, fn(c))
+		data := fn(c)
+		if !c.IsAborted() {
+			c.XML(http.StatusOK, data)
+		}
 	}
 }
 
 func (o *Controller) JsonpView(fn func(*gin.Context) interface{}) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.JSONP(http.StatusOK, fn(c))
+		data := fn(c)
+		if !c.IsAborted() {
+			c.JSONP(http.StatusOK, data)
+		}
 	}
 }
 
 func (o *Controller) StringView(fn func(*gin.Context) string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.String(http.StatusOK, fn(c))
+		data := fn(c)
+		if !c.IsAborted() {
+			c.String(http.StatusOK, data)
+		}
 	}
 }
