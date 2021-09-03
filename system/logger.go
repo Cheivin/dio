@@ -18,6 +18,7 @@ type Log struct {
 	MaxAge    int    `value:"log.max-age"` // 存活日期，单位天
 	DebugMode bool   `value:"log.debug"`
 	Std       bool   `value:"log.std"`
+	File      bool   `value:"log.file"`
 	TraceName string `value:"log.trace-Name"` // 会话追踪名称
 }
 
@@ -30,11 +31,11 @@ func (l *Log) BeanConstruct() {
 	if l.MaxAge <= 0 {
 		l.MaxAge = 7
 	}
-
+	// 不输出文件的时候强制开启输出控制台
+	if l.File == false && l.Std == false {
+		l.Std = true
+	}
 	// 开始配置zap日志
-	infoWriter := l.getLogWriter(path.Join(l.Dir, l.Name) + ".log")
-	errorWriter := l.getLogWriter(path.Join(l.Dir, l.Name) + "_error.log")
-
 	var levelEnable zap.LevelEnablerFunc
 	var options []zap.Option
 	if l.DebugMode {
@@ -47,13 +48,20 @@ func (l *Log) BeanConstruct() {
 			return lvl >= zapcore.InfoLevel
 		}
 	}
-	cores := []zapcore.Core{
-		zapcore.NewCore(l.getLogEncoder(), zapcore.AddSync(infoWriter), levelEnable),
-		zapcore.NewCore(l.getLogEncoder(), zapcore.AddSync(errorWriter), zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-			return lvl >= zapcore.ErrorLevel
-		})),
+	var cores []zapcore.Core
+	// 输出到文件
+	if l.File {
+		infoWriter := l.getLogWriter(path.Join(l.Dir, l.Name) + ".log")
+		errorWriter := l.getLogWriter(path.Join(l.Dir, l.Name) + "_error.log")
+		cores = []zapcore.Core{
+			zapcore.NewCore(l.getLogEncoder(), zapcore.AddSync(infoWriter), levelEnable),
+			zapcore.NewCore(l.getLogEncoder(), zapcore.AddSync(errorWriter), zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+				return lvl >= zapcore.ErrorLevel
+			})),
+		}
 	}
-	if l.Std {
+	// 输出到控制台,
+	if len(cores) == 0 || l.Std {
 		cores = append(cores, zapcore.NewCore(l.getLogColorLevelEncoder(), zapcore.Lock(os.Stdout), zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 			return lvl >= zapcore.DebugLevel
 		})))

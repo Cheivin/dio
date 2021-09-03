@@ -62,6 +62,7 @@ func init() {
 		"max-age":    30,
 		"debug":      true,
 		"std":        true,
+		"file":       true,
 		"trace-name": defaultTraceName,
 	})
 	di.Provide(system.Log{})
