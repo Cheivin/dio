@@ -28,6 +28,10 @@ func (l *Log) BeanConstruct() {
 	if l.Name == "" {
 		l.Name = "log"
 	}
+	if strings.Contains(l.Name, "@hostname") {
+		hostname, _ := os.Hostname()
+		strings.ReplaceAll(l.Name, "@hostname", hostname)
+	}
 	if l.MaxAge <= 0 {
 		l.MaxAge = 7
 	}
