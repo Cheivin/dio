@@ -2,6 +2,7 @@ package testing
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"github.com/cheivin/dio"
 	"testing"
@@ -26,4 +27,12 @@ func TestRun(t *testing.T) {
 		MySQL().
 		ProvideOnProperty(A{}, "app.env", "dev").
 		Run(context.Background())
+}
+
+//go:embed configs/*.yaml
+var configs embed.FS
+
+func TestYamlConfig(t *testing.T) {
+	dio.LoadConfig(configs, "configs/dev.yaml")
+	dio.Web(true, true).Run(context.Background())
 }

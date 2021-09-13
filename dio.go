@@ -2,13 +2,16 @@ package dio
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"github.com/cheivin/di"
 	"github.com/cheivin/dio/internal/mysql"
 	"github.com/cheivin/dio/internal/web"
 	"github.com/cheivin/dio/middleware"
 	"github.com/cheivin/dio/system"
+	"gopkg.in/yaml.v2"
 	"gorm.io/gorm"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"strings"
@@ -86,6 +89,10 @@ func (d *dio) SetProperty(key string, value interface{}) *dio {
 func (d *dio) SetPropertyMap(properties map[string]interface{}) *dio {
 	di.SetPropertyMap(properties)
 	return d
+}
+
+func (d *dio) HasProperty(property string) bool {
+	return di.Property().Get(property) != nil
 }
 
 func (d *dio) GetPropertyString(property string) string {
@@ -178,27 +185,33 @@ func (d *dio) Run(ctx context.Context) {
 }
 
 func (d *dio) Web(useLogger, useCors bool) *dio {
-	di.SetDefaultPropertyMap(map[string]interface{}{
-		"app.port": 8080,
-	})
+	if !d.HasProperty("app.port") {
+		di.SetDefaultPropertyMap(map[string]interface{}{
+			"app.port": 8080,
+		})
+	}
 	di.Provide(web.Container{})
 	if useLogger {
-		di.SetDefaultProperty("app.web.log", map[string]interface{}{
-			"skip-path":  "",
-			"trace-name": defaultTraceName,
-		})
+		if !d.HasProperty("app.web.log") {
+			di.SetDefaultProperty("app.web.log", map[string]interface{}{
+				"skip-path":  "",
+				"trace-name": defaultTraceName,
+			})
+		}
 		di.Provide(middleware.WebLogger{})
 	}
 	di.Provide(middleware.WebRecover{})
 	if useCors {
-		di.SetDefaultProperty("app.web.cors", map[string]interface{}{
-			"origin":            "",
-			"method":            "",
-			"header":            "",
-			"allow-credentials": true,
-			"expose-header":     "",
-			"max-age":           43200,
-		})
+		if !d.HasProperty("app.web.cors") {
+			di.SetDefaultProperty("app.web.cors", map[string]interface{}{
+				"origin":            "",
+				"method":            "",
+				"header":            "",
+				"allow-credentials": true,
+				"expose-header":     "",
+				"max-age":           43200,
+			})
+		}
 		di.Provide(middleware.WebCors{})
 	}
 	di.Provide(system.Controller{})
@@ -207,18 +220,54 @@ func (d *dio) Web(useLogger, useCors bool) *dio {
 
 func (d *dio) MySQL(options ...gorm.Option) *dio {
 	mysql.SetOptions(options...)
-	di.SetDefaultProperty("mysql", map[string]interface{}{
-		"username": "root",
-		"password": "root",
-		"host":     "localhost",
-		"port":     3306,
-		"pool": map[string]interface{}{
-			"max-idle": 0,
-			"max-open": 0,
-		},
-		"log.level": 4,
-	})
+	if !d.HasProperty("mysql") {
+		di.SetDefaultProperty("mysql", map[string]interface{}{
+			"username": "root",
+			"password": "root",
+			"host":     "localhost",
+			"port":     3306,
+			"pool": map[string]interface{}{
+				"max-idle": 0,
+				"max-open": 0,
+			},
+			"log.level": 4,
+		})
+	}
 	di.Provide(mysql.GormConfiguration{})
 	di.Provide(mysql.GormLogger{})
 	return d
+}
+
+func (d *dio) LoadDefaultConfig(configs embed.FS, filename string) *dio {
+	f, err := configs.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	data, err := ioutil.ReadAll(f)
+	if err != nil {
+		panic(err)
+	}
+	configMap := map[string]interface{}{}
+	if err := yaml.Unmarshal(data, &configMap); err != nil {
+		panic(err)
+	}
+	g.SetDefaultPropertyMap(configMap)
+	return g
+}
+
+func (d *dio) LoadConfig(configs embed.FS, filename string) *dio {
+	f, err := configs.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+	data, err := ioutil.ReadAll(f)
+	if err != nil {
+		panic(err)
+	}
+	configMap := map[string]interface{}{}
+	if err := yaml.Unmarshal(data, &configMap); err != nil {
+		panic(err)
+	}
+	g.SetPropertyMap(configMap)
+	return g
 }

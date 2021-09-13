@@ -53,15 +53,15 @@ func (w *WebLogger) log(c *gin.Context) {
 	raw := c.Request.URL.RawQuery
 
 	// 设置id
-	var reqId string
 	if w.TraceName != "" {
-		reqId = c.GetHeader(w.TraceName)
+		reqId := c.GetHeader(w.TraceName)
+
+		if reqId == "" {
+			reqId = w.idGenerator(c)
+			c.Header(w.TraceName, reqId)
+		}
+		c.Set(w.Log.TraceName, reqId)
 	}
-	if reqId == "" {
-		reqId = w.idGenerator(c)
-		c.Header(w.TraceName, reqId)
-	}
-	c.Set(w.Log.TraceName, reqId)
 	// 处理请求
 	c.Next()
 

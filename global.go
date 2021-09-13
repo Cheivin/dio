@@ -2,6 +2,7 @@ package dio
 
 import (
 	"context"
+	"embed"
 	"gorm.io/gorm"
 )
 
@@ -75,4 +76,12 @@ func Web(useLogger, useCors bool) *dio {
 
 func MySQL(options ...gorm.Option) *dio {
 	return g.MySQL(options...)
+}
+
+func LoadDefaultConfig(configs embed.FS, filename string) *dio {
+	return g.LoadDefaultConfig(configs, filename)
+}
+
+func LoadConfig(configs embed.FS, filename string) *dio {
+	return g.LoadConfig(configs, filename)
 }
