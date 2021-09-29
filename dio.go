@@ -12,13 +12,13 @@ import (
 	"gopkg.in/yaml.v2"
 	"gorm.io/gorm"
 	"io/ioutil"
-	"os"
 	"os/signal"
 	"strings"
 	"syscall"
 )
 
 type dio struct {
+	di            *di.DI
 	providedBeans []bean
 	loaded        bool
 }
@@ -49,54 +49,34 @@ func (b bean) matchProperty() (match bool) {
 	}
 }
 
-var g *dio
-
 const defaultTraceName = "X-Request-Id"
 
-func init() {
-	g = &dio{providedBeans: []bean{}, loaded: false}
-	logName := "dio_app"
-	if hostname, err := os.Hostname(); err == nil && hostname != "" {
-		logName += "_" + hostname
-	}
-	di.SetDefaultProperty("log", map[string]interface{}{
-		"name":       logName,
-		"dir":        "./logs",
-		"max-age":    30,
-		"debug":      true,
-		"std":        true,
-		"file":       true,
-		"trace-name": defaultTraceName,
-	})
-	di.Provide(system.Log{})
-}
-
 func (d *dio) SetDefaultProperty(key string, value interface{}) *dio {
-	di.SetDefaultProperty(key, value)
+	d.di.SetDefaultProperty(key, value)
 	return d
 }
 
 func (d *dio) SetDefaultPropertyMap(properties map[string]interface{}) *dio {
-	di.SetDefaultPropertyMap(properties)
+	d.di.SetDefaultPropertyMap(properties)
 	return d
 }
 
 func (d *dio) SetProperty(key string, value interface{}) *dio {
-	di.SetProperty(key, value)
+	d.di.SetProperty(key, value)
 	return d
 }
 
 func (d *dio) SetPropertyMap(properties map[string]interface{}) *dio {
-	di.SetPropertyMap(properties)
+	d.di.SetPropertyMap(properties)
 	return d
 }
 
 func (d *dio) HasProperty(property string) bool {
-	return di.Property().Get(property) != nil
+	return d.di.Property().Get(property) != nil
 }
 
 func (d *dio) GetPropertyString(property string) string {
-	val := di.Property().Get(property)
+	val := d.di.Property().Get(property)
 	if val == nil {
 		return ""
 	} else {
@@ -106,17 +86,17 @@ func (d *dio) GetPropertyString(property string) string {
 
 func (d *dio) AutoMigrateEnv() *dio {
 	envMap := di.LoadEnvironment(strings.NewReplacer("_", "."), false)
-	di.SetPropertyMap(envMap)
+	d.di.SetPropertyMap(envMap)
 	return d
 }
 
 func (d *dio) RegisterBean(bean interface{}) *dio {
-	di.RegisterBean(bean)
+	d.di.RegisterBean(bean)
 	return d
 }
 
 func (d *dio) RegisterNamedBean(name string, bean interface{}) *dio {
-	di.RegisterNamedBean(name, bean)
+	d.di.RegisterNamedBean(name, bean)
 	return d
 }
 
@@ -166,7 +146,7 @@ func (d *dio) ProvideNamedBeanNotOnProperty(beanName string, prototype interface
 }
 
 func (d *dio) GetBean(beanName string) (bean interface{}, ok bool) {
-	return di.GetBean(beanName)
+	return d.di.GetBean(beanName)
 }
 
 func (d *dio) Run(ctx context.Context) {
@@ -178,32 +158,32 @@ func (d *dio) Run(ctx context.Context) {
 	for i := range g.providedBeans {
 		beanDefinition := g.providedBeans[i]
 		if beanDefinition.matchProperty() {
-			di.ProvideNamedBean(beanDefinition.name, beanDefinition.instance)
+			d.di.ProvideNamedBean(beanDefinition.name, beanDefinition.instance)
 		}
 	}
-	di.LoadAndServ(ctx)
+	d.di.LoadAndServ(ctx)
 }
 
 func (d *dio) Web(useLogger, useCors bool) *dio {
 	if !d.HasProperty("app.port") {
-		di.SetDefaultPropertyMap(map[string]interface{}{
+		d.di.SetDefaultPropertyMap(map[string]interface{}{
 			"app.port": 8080,
 		})
 	}
-	di.Provide(web.Container{})
+	d.di.Provide(web.Container{})
 	if useLogger {
 		if !d.HasProperty("app.web.log") {
-			di.SetDefaultProperty("app.web.log", map[string]interface{}{
+			d.di.SetDefaultProperty("app.web.log", map[string]interface{}{
 				"skip-path":  "",
 				"trace-name": defaultTraceName,
 			})
 		}
-		di.Provide(middleware.WebLogger{})
+		d.di.Provide(middleware.WebLogger{})
 	}
-	di.Provide(middleware.WebRecover{})
+	d.di.Provide(middleware.WebRecover{})
 	if useCors {
 		if !d.HasProperty("app.web.cors") {
-			di.SetDefaultProperty("app.web.cors", map[string]interface{}{
+			d.di.SetDefaultProperty("app.web.cors", map[string]interface{}{
 				"origin":            "",
 				"method":            "",
 				"header":            "",
@@ -212,16 +192,16 @@ func (d *dio) Web(useLogger, useCors bool) *dio {
 				"max-age":           43200,
 			})
 		}
-		di.Provide(middleware.WebCors{})
+		d.di.Provide(middleware.WebCors{})
 	}
-	di.Provide(system.Controller{})
+	d.di.Provide(system.Controller{})
 	return d
 }
 
 func (d *dio) MySQL(options ...gorm.Option) *dio {
 	mysql.SetOptions(options...)
 	if !d.HasProperty("mysql") {
-		di.SetDefaultProperty("mysql", map[string]interface{}{
+		d.di.SetDefaultProperty("mysql", map[string]interface{}{
 			"username": "root",
 			"password": "root",
 			"host":     "localhost",
@@ -233,8 +213,8 @@ func (d *dio) MySQL(options ...gorm.Option) *dio {
 			"log.level": 4,
 		})
 	}
-	di.Provide(mysql.GormConfiguration{})
-	di.Provide(mysql.GormLogger{})
+	d.di.Provide(mysql.GormConfiguration{})
+	d.di.Provide(mysql.GormLogger{})
 	return d
 }
 

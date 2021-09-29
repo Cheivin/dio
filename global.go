@@ -3,8 +3,31 @@ package dio
 import (
 	"context"
 	"embed"
+	"github.com/cheivin/di"
+	"github.com/cheivin/dio/system"
 	"gorm.io/gorm"
+	"os"
 )
+
+var g *dio
+
+func init() {
+	g = &dio{di: di.New(), providedBeans: []bean{}, loaded: false}
+	logName := "dio_app"
+	if hostname, err := os.Hostname(); err == nil && hostname != "" {
+		logName += "_" + hostname
+	}
+	g.SetDefaultProperty("log", map[string]interface{}{
+		"name":       logName,
+		"dir":        "./logs",
+		"max-age":    30,
+		"debug":      true,
+		"std":        true,
+		"file":       true,
+		"trace-name": defaultTraceName,
+	})
+	g.Provide(system.Log{})
+}
 
 func SetDefaultProperty(key string, value interface{}) *dio {
 	return g.SetDefaultProperty(key, value)
