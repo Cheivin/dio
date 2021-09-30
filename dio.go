@@ -30,13 +30,13 @@ type bean struct {
 	needMatch    bool
 }
 
-func (b bean) matchProperty() (match bool) {
+func (b bean) matchProperty(d *dio) (match bool) {
 	// 空值表示未设定条件
 	if b.property == "" {
 		return true
 	}
 	// 取出比较的属性值
-	val := di.Property().Get(b.property)
+	val := d.di.Property().Get(b.property)
 	if val == nil {
 		match = b.compareValue == ""
 	} else {
@@ -157,7 +157,7 @@ func (d *dio) Run(ctx context.Context) {
 	defer stop()
 	for i := range g.providedBeans {
 		beanDefinition := g.providedBeans[i]
-		if beanDefinition.matchProperty() {
+		if beanDefinition.matchProperty(d) {
 			d.di.ProvideNamedBean(beanDefinition.name, beanDefinition.instance)
 		}
 	}
