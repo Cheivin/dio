@@ -3,6 +3,7 @@ package mysql
 import (
 	"fmt"
 	"github.com/cheivin/dio"
+	"github.com/cheivin/dio/plugin/mysql/dao"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"net/url"
@@ -83,6 +84,8 @@ func (c *GormConfiguration) BeanConstruct() {
 	// 注册db
 	c.db = db
 	dio.RegisterNamedBean("mysql", db)
+	baseDao := dao.New(db)
+	dio.RegisterNamedBean("mysqlDao", baseDao)
 }
 
 // AfterPropertiesSet 注入完成时触发
