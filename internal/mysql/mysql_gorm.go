@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"fmt"
-	"github.com/cheivin/dio/internal"
+	"github.com/cheivin/di"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"net/url"
@@ -44,7 +44,7 @@ func (c *GormConfiguration) parseParameters() {
 	}
 }
 
-func (c *GormConfiguration) BeanConstruct() {
+func (c *GormConfiguration) BeanConstruct(container *di.DI) {
 	c.parseParameters()
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s", []interface{}{
@@ -82,7 +82,7 @@ func (c *GormConfiguration) BeanConstruct() {
 	sqlDB.SetMaxOpenConns(c.MaxOpen)
 	// 注册db
 	c.db = db
-	internal.Di().RegisterNamedBean("mysql", db)
+	container.RegisterNamedBean("mysql", db)
 }
 
 // AfterPropertiesSet 注入完成时触发
