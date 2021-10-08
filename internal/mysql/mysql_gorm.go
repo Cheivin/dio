@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"fmt"
-	"github.com/cheivin/dio"
+	"github.com/cheivin/dio/internal"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"net/url"
@@ -82,7 +82,7 @@ func (c *GormConfiguration) BeanConstruct() {
 	sqlDB.SetMaxOpenConns(c.MaxOpen)
 	// 注册db
 	c.db = db
-	dio.RegisterNamedBean("mysql", db)
+	internal.Di().RegisterNamedBean("mysql", db)
 }
 
 // AfterPropertiesSet 注入完成时触发

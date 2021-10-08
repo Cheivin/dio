@@ -3,7 +3,7 @@ package web
 import (
 	"context"
 	"fmt"
-	"github.com/cheivin/di"
+	"github.com/cheivin/dio/internal"
 	"github.com/cheivin/dio/system"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -26,7 +26,7 @@ func (w *Container) BeanConstruct() {
 	w.router = gin.New()
 	w.router.RemoteIPHeaders = []string{"X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"}
 	// 注册gin到容器
-	di.RegisterNamedBean("web", w.router)
+	internal.Di().RegisterNamedBean("web", w.router)
 }
 
 // AfterPropertiesSet 注入完成时触发

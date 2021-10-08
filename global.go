@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"github.com/cheivin/di"
+	"github.com/cheivin/dio/internal"
 	"github.com/cheivin/dio/system"
 	"gorm.io/gorm"
 	"os"
@@ -13,6 +14,8 @@ var g *dio
 
 func init() {
 	g = &dio{di: di.New(), providedBeans: []bean{}, loaded: false}
+	internal.SetDi(g.di)
+
 	logName := "dio_app"
 	if hostname, err := os.Hostname(); err == nil && hostname != "" {
 		logName += "_" + hostname
