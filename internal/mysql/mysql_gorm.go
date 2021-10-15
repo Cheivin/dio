@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"fmt"
-	"github.com/cheivin/dio"
+	"github.com/cheivin/di"
 	"github.com/cheivin/dio/plugin/mysql/dao"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -45,7 +45,7 @@ func (c *GormConfiguration) parseParameters() {
 	}
 }
 
-func (c *GormConfiguration) BeanConstruct() {
+func (c *GormConfiguration) BeanConstruct(container *di.DI) {
 	c.parseParameters()
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s", []interface{}{
@@ -83,9 +83,9 @@ func (c *GormConfiguration) BeanConstruct() {
 	sqlDB.SetMaxOpenConns(c.MaxOpen)
 	// 注册db
 	c.db = db
-	dio.RegisterNamedBean("mysql", db)
+	container.RegisterNamedBean("mysql", db)
 	baseDao := dao.New(db)
-	dio.RegisterNamedBean("mysqlDao", baseDao)
+	container.RegisterNamedBean("mysqlDao", baseDao)
 }
 
 // AfterPropertiesSet 注入完成时触发
