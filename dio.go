@@ -23,11 +23,12 @@ type dio struct {
 	loaded        bool
 }
 type bean struct {
-	name         string
-	instance     interface{}
-	property     string
-	compareValue string
-	needMatch    bool
+	name            string
+	instance        interface{}
+	property        string
+	compareValue    string
+	caseInsensitive bool
+	needMatch       bool
 }
 
 func (b bean) matchProperty(d *dio) (match bool) {
@@ -40,7 +41,12 @@ func (b bean) matchProperty(d *dio) (match bool) {
 	if val == nil {
 		match = b.compareValue == ""
 	} else {
-		match = fmt.Sprintf("%v", val) == b.compareValue
+		compareValue := fmt.Sprintf("%v", val)
+		if b.caseInsensitive {
+			match = strings.EqualFold(compareValue, b.compareValue)
+		} else {
+			match = compareValue == b.compareValue
+		}
 	}
 	if b.needMatch {
 		return match
@@ -109,38 +115,40 @@ func (d *dio) ProvideNamedBean(beanName string, prototype interface{}) *dio {
 	return d.ProvideNamedBeanOnProperty(beanName, prototype, "", "")
 }
 
-func (d *dio) ProvideOnProperty(prototype interface{}, property string, compareValue string) *dio {
-	return d.ProvideNamedBeanOnProperty("", prototype, property, compareValue)
+func (d *dio) ProvideOnProperty(prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
+	return d.ProvideNamedBeanOnProperty("", prototype, property, compareValue, caseInsensitive...)
 }
 
-func (d *dio) ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string) *dio {
+func (d *dio) ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
 	if g.loaded {
 		panic("dio is already run")
 	}
 	g.providedBeans = append(g.providedBeans,
 		bean{name: beanName,
-			instance:     prototype,
-			property:     property,
-			compareValue: compareValue,
-			needMatch:    true,
+			instance:        prototype,
+			property:        property,
+			compareValue:    compareValue,
+			needMatch:       true,
+			caseInsensitive: len(caseInsensitive) > 0 && caseInsensitive[0] == true,
 		})
 	return d
 }
 
-func (d *dio) ProvideNotOnProperty(prototype interface{}, property string, compareValue string) *dio {
-	return d.ProvideNamedBeanNotOnProperty("", prototype, property, compareValue)
+func (d *dio) ProvideNotOnProperty(prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
+	return d.ProvideNamedBeanNotOnProperty("", prototype, property, compareValue, caseInsensitive...)
 }
 
-func (d *dio) ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string) *dio {
+func (d *dio) ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
 	if g.loaded {
 		panic("dio is already run")
 	}
 	g.providedBeans = append(g.providedBeans,
 		bean{name: beanName,
-			instance:     prototype,
-			property:     property,
-			compareValue: compareValue,
-			needMatch:    false,
+			instance:        prototype,
+			property:        property,
+			compareValue:    compareValue,
+			needMatch:       false,
+			caseInsensitive: len(caseInsensitive) > 0 && caseInsensitive[0] == true,
 		})
 	return d
 }
