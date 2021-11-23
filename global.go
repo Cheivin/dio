@@ -69,20 +69,20 @@ func ProvideNamedBean(beanName string, prototype interface{}) *dio {
 	return g.ProvideNamedBean(beanName, prototype)
 }
 
-func ProvideOnProperty(prototype interface{}, property string, compareValue string) *dio {
-	return g.ProvideOnProperty(prototype, property, compareValue)
+func ProvideOnProperty(prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
+	return g.ProvideOnProperty(prototype, property, compareValue, caseInsensitive...)
 }
 
-func ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string) *dio {
-	return g.ProvideNamedBeanOnProperty(beanName, prototype, property, compareValue)
+func ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
+	return g.ProvideNamedBeanOnProperty(beanName, prototype, property, compareValue, caseInsensitive...)
 }
 
-func ProvideNotOnProperty(prototype interface{}, property string, compareValue string) *dio {
-	return g.ProvideNotOnProperty(prototype, property, compareValue)
+func ProvideNotOnProperty(prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
+	return g.ProvideNotOnProperty(prototype, property, compareValue, caseInsensitive...)
 }
 
-func ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string) *dio {
-	return g.ProvideNamedBeanNotOnProperty(beanName, prototype, property, compareValue)
+func ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
+	return g.ProvideNamedBeanNotOnProperty(beanName, prototype, property, compareValue, caseInsensitive...)
 }
 
 func GetBean(beanName string) (bean interface{}, ok bool) {
