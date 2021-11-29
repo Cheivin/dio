@@ -85,7 +85,7 @@ func (c *GormConfiguration) BeanConstruct(container *di.DI) {
 	c.db = db
 	container.RegisterNamedBean("mysql", db)
 	baseDao := dao.New(db)
-	container.RegisterNamedBean("mysqlDao", baseDao)
+	container.RegisterBean(baseDao)
 }
 
 // AfterPropertiesSet 注入完成时触发

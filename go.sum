@@ -1,7 +1,5 @@
 github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLju8=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
-github.com/cheivin/di v0.0.8 h1:VzTHVEPv4ZVpBm6wXsS4dHpKRTy265a8DJBhRIINcdg=
-github.com/cheivin/di v0.0.8/go.mod h1:Y2QRwodWnEq5LkWsEXXH8IsllkJX/UEz9jMVwZegego=
 github.com/cheivin/di v0.0.10-0.20211123142518-b87be51d2091 h1:6kPEkTtDxEvDCuI3y4idjun7+VtUypcUoLWb9ObY3Cc=
 github.com/cheivin/di v0.0.10-0.20211123142518-b87be51d2091/go.mod h1:Y2QRwodWnEq5LkWsEXXH8IsllkJX/UEz9jMVwZegego=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=

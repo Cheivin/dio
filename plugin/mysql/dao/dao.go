@@ -15,6 +15,10 @@ type Dao struct {
 	dst interface{}
 }
 
+func (Dao) BeanName() string {
+	return "mysqlDao"
+}
+
 func New(db *gorm.DB) *Dao {
 	return &Dao{
 		db: db,
@@ -137,7 +141,18 @@ func (dao *Dao) FindAll(cause *wrapper.Query, target interface{}) error {
 	return dao.Where(cause).Find(target).Error
 }
 
-func (dao *Dao) Page(page, size int, cause *wrapper.Query, target interface{}) (total int64, err error) {
+func (dao *Dao) List(cause *wrapper.Query, target interface{}, limit ...int) error {
+	db := dao.scopeQueryAndOrder(cause)
+	switch len(limit) {
+	case 2:
+		db = db.Offset(limit[0]).Limit(limit[1])
+	case 1:
+		db = db.Offset(0).Limit(limit[0])
+	}
+	return db.Find(target).Error
+}
+
+func (dao *Dao) Page(cause *wrapper.Query, target interface{}, page, size int) (total int64, err error) {
 	err = dao.scopeQuery(cause).Count(&total).Error
 	if err != nil {
 		return
