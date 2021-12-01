@@ -32,7 +32,7 @@ log:
   name: dio
   dir: ./logs
   max-age: 30
-  debug: true
+  debug: false
   std: true
   file: true
   trace-name: X-Request-Id

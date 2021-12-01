@@ -66,9 +66,7 @@ func (l *Log) BeanConstruct() {
 	}
 	// 输出到控制台,
 	if len(cores) == 0 || l.Std {
-		cores = append(cores, zapcore.NewCore(l.getLogColorLevelEncoder(), zapcore.Lock(os.Stdout), zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
-			return lvl >= zapcore.DebugLevel
-		})))
+		cores = append(cores, zapcore.NewCore(l.getLogColorLevelEncoder(), zapcore.Lock(os.Stdout), levelEnable))
 	}
 	core := zapcore.NewTee(cores...)
 	zapLogger := zap.New(core).WithOptions(options...)
@@ -201,4 +199,8 @@ func (l *Log) Warnw(ctx context.Context, msg string, keyAndValues ...map[string]
 
 func (l *Log) Errorw(ctx context.Context, msg string, keyAndValues ...map[string]interface{}) {
 	l.logger.Named(l.getTraceId(ctx)).With(l.map2slice(keyAndValues...)...).Error(msg)
+}
+
+func (l *Log) Logger() *zap.Logger {
+	return l.logger.Desugar()
 }

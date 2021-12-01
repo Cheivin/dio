@@ -18,17 +18,19 @@ import (
 )
 
 type dio struct {
-	di            *di.DI
+	di            di.DI
 	providedBeans []bean
 	loaded        bool
 }
+
 type bean struct {
-	name            string
-	instance        interface{}
-	property        string
-	compareValue    string
-	caseInsensitive bool
-	needMatch       bool
+	name            string      // 名称
+	instance        interface{} // 实例
+	needMatch       bool        // 是否条件载入
+	property        string      // 条件载入配置项
+	compareValue    string      // 条件载入配置比较值
+	caseInsensitive bool        // 条件载入配置比较值大小写敏感
+	registered      bool        // 是否为手动注册的bean
 }
 
 func (b bean) matchProperty(d *dio) (match bool) {
@@ -92,17 +94,26 @@ func (d *dio) GetPropertyString(property string) string {
 
 func (d *dio) AutoMigrateEnv() *dio {
 	envMap := di.LoadEnvironment(strings.NewReplacer("_", "."), false)
-	d.di.SetPropertyMap(envMap)
+	d.SetPropertyMap(envMap)
 	return d
 }
 
-func (d *dio) RegisterBean(bean interface{}) *dio {
-	d.di.RegisterBean(bean)
+func (d *dio) RegisterBean(beanInstance interface{}) *dio {
+	d.RegisterNamedBean("", beanInstance)
 	return d
 }
 
-func (d *dio) RegisterNamedBean(name string, bean interface{}) *dio {
-	d.di.RegisterNamedBean(name, bean)
+func (d *dio) RegisterNamedBean(beanName string, beanInstance interface{}) *dio {
+	if d.loaded {
+		d.di.RegisterNamedBean(beanName, beanInstance)
+	} else {
+		d.providedBeans = append(d.providedBeans,
+			bean{name: beanName,
+				instance:   beanInstance,
+				needMatch:  false,
+				registered: true,
+			})
+	}
 	return d
 }
 
@@ -120,10 +131,10 @@ func (d *dio) ProvideOnProperty(prototype interface{}, property string, compareV
 }
 
 func (d *dio) ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
-	if g.loaded {
+	if d.loaded {
 		panic("dio is already run")
 	}
-	g.providedBeans = append(g.providedBeans,
+	d.providedBeans = append(d.providedBeans,
 		bean{name: beanName,
 			instance:        prototype,
 			property:        property,
@@ -139,10 +150,10 @@ func (d *dio) ProvideNotOnProperty(prototype interface{}, property string, compa
 }
 
 func (d *dio) ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
-	if g.loaded {
+	if d.loaded {
 		panic("dio is already run")
 	}
-	g.providedBeans = append(g.providedBeans,
+	d.providedBeans = append(d.providedBeans,
 		bean{name: beanName,
 			instance:        prototype,
 			property:        property,
@@ -158,40 +169,57 @@ func (d *dio) GetBean(beanName string) (bean interface{}, ok bool) {
 }
 
 func (d *dio) Run(ctx context.Context) {
-	if g.loaded {
+	if d.loaded {
 		panic("dio is already run")
 	}
+	d.loaded = true
+
+	// 配置日志组件
+	systemLog := d.di.NewBean(system.Log{}).(*system.Log)
+	dioLog := newDiLogger(ctx, systemLog)
+	d.di.Log(dioLog)
+	d.di.RegisterBean(systemLog)
+
 	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
-	for i := range g.providedBeans {
-		beanDefinition := g.providedBeans[i]
+
+	// 配置bean
+	for i := range d.providedBeans {
+		beanDefinition := d.providedBeans[i]
 		if beanDefinition.matchProperty(d) {
-			d.di.ProvideNamedBean(beanDefinition.name, beanDefinition.instance)
+			if beanDefinition.registered {
+				d.di.RegisterNamedBean(beanDefinition.name, beanDefinition.instance)
+			} else {
+				d.di.ProvideNamedBean(beanDefinition.name, beanDefinition.instance)
+			}
 		}
 	}
-	d.di.LoadAndServ(ctx)
+
+	// 启动容器
+	d.di.Load()
+	d.di.Serve(ctx)
 }
 
 func (d *dio) Web(useLogger, useCors bool) *dio {
 	if !d.HasProperty("app.port") {
-		d.di.SetDefaultPropertyMap(map[string]interface{}{
+		d.SetDefaultPropertyMap(map[string]interface{}{
 			"app.port": 8080,
 		})
 	}
-	d.di.Provide(web.Container{})
+	d.Provide(web.Container{})
 	if useLogger {
 		if !d.HasProperty("app.web.log") {
-			d.di.SetDefaultProperty("app.web.log", map[string]interface{}{
+			d.SetDefaultProperty("app.web.log", map[string]interface{}{
 				"skip-path":  "",
 				"trace-name": defaultTraceName,
 			})
 		}
-		d.di.Provide(middleware.WebLogger{})
+		d.Provide(middleware.WebLogger{})
 	}
-	d.di.Provide(middleware.WebRecover{})
+	d.Provide(middleware.WebRecover{})
 	if useCors {
 		if !d.HasProperty("app.web.cors") {
-			d.di.SetDefaultProperty("app.web.cors", map[string]interface{}{
+			d.SetDefaultProperty("app.web.cors", map[string]interface{}{
 				"origin":            "",
 				"method":            "",
 				"header":            "",
@@ -200,16 +228,16 @@ func (d *dio) Web(useLogger, useCors bool) *dio {
 				"max-age":           43200,
 			})
 		}
-		d.di.Provide(middleware.WebCors{})
+		d.Provide(middleware.WebCors{})
 	}
-	d.di.Provide(system.Controller{})
+	d.Provide(system.Controller{})
 	return d
 }
 
 func (d *dio) MySQL(options ...gorm.Option) *dio {
 	mysql.SetOptions(options...)
 	if !d.HasProperty("mysql") {
-		d.di.SetDefaultProperty("mysql", map[string]interface{}{
+		d.SetDefaultProperty("mysql", map[string]interface{}{
 			"username": "root",
 			"password": "root",
 			"host":     "localhost",
@@ -221,8 +249,8 @@ func (d *dio) MySQL(options ...gorm.Option) *dio {
 			"log.level": 4,
 		})
 	}
-	d.di.Provide(mysql.GormConfiguration{})
-	d.di.Provide(mysql.GormLogger{})
+	d.Provide(mysql.GormConfiguration{})
+	d.Provide(mysql.GormLogger{})
 	return d
 }
 
@@ -239,7 +267,7 @@ func (d *dio) LoadDefaultConfig(configs embed.FS, filename string) *dio {
 	if err := yaml.Unmarshal(data, &configMap); err != nil {
 		panic(err)
 	}
-	g.SetDefaultPropertyMap(configMap)
+	d.SetDefaultPropertyMap(configMap)
 	return g
 }
 
@@ -256,6 +284,6 @@ func (d *dio) LoadConfig(configs embed.FS, filename string) *dio {
 	if err := yaml.Unmarshal(data, &configMap); err != nil {
 		panic(err)
 	}
-	g.SetPropertyMap(configMap)
+	d.SetPropertyMap(configMap)
 	return g
 }

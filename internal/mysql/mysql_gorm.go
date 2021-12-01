@@ -45,7 +45,7 @@ func (c *GormConfiguration) parseParameters() {
 	}
 }
 
-func (c *GormConfiguration) BeanConstruct(container *di.DI) {
+func (c *GormConfiguration) BeanConstruct(container di.DI) {
 	c.parseParameters()
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s", []interface{}{

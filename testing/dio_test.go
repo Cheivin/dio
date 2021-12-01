@@ -28,5 +28,5 @@ var configs embed.FS
 
 func TestYamlConfig(t *testing.T) {
 	dio.LoadConfig(configs, "configs/dev.yaml")
-	dio.Web(true, true).Run(context.Background())
+	dio.Web(true, true).MySQL().Run(context.Background())
 }
