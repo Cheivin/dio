@@ -17,8 +17,7 @@ func (A) BeanConstruct() {
 
 func TestRun(t *testing.T) {
 	dio.SetProperty("app.env", "dev")
-	dio.Web(true, true).
-		MySQL().
+	dio.Use(dio.Web(true, true), dio.MySQL()).
 		ProvideOnProperty(A{}, "app.env", "dev").
 		Run(context.Background())
 }
@@ -28,5 +27,5 @@ var configs embed.FS
 
 func TestYamlConfig(t *testing.T) {
 	dio.LoadConfig(configs, "configs/dev.yaml")
-	dio.Web(true, true).MySQL().Run(context.Background())
+	dio.Use(dio.Web(true, true), dio.MySQL()).Run(context.Background())
 }

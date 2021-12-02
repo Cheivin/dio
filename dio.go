@@ -5,12 +5,8 @@ import (
 	"embed"
 	"fmt"
 	"github.com/cheivin/di"
-	"github.com/cheivin/dio/internal/mysql"
-	"github.com/cheivin/dio/internal/web"
-	"github.com/cheivin/dio/middleware"
 	"github.com/cheivin/dio/system"
 	"gopkg.in/yaml.v2"
-	"gorm.io/gorm"
 	"io/ioutil"
 	"os/signal"
 	"strings"
@@ -200,57 +196,10 @@ func (d *dio) Run(ctx context.Context) {
 	d.di.Serve(ctx)
 }
 
-func (d *dio) Web(useLogger, useCors bool) *dio {
-	if !d.HasProperty("app.port") {
-		d.SetDefaultPropertyMap(map[string]interface{}{
-			"app.port": 8080,
-		})
+func (d *dio) Use(plugins ...PluginConfig) *dio {
+	for i := range plugins {
+		plugins[i](g)
 	}
-	d.Provide(web.Container{})
-	if useLogger {
-		if !d.HasProperty("app.web.log") {
-			d.SetDefaultProperty("app.web.log", map[string]interface{}{
-				"skip-path":  "",
-				"trace-name": defaultTraceName,
-			})
-		}
-		d.Provide(middleware.WebLogger{})
-	}
-	d.Provide(middleware.WebRecover{})
-	if useCors {
-		if !d.HasProperty("app.web.cors") {
-			d.SetDefaultProperty("app.web.cors", map[string]interface{}{
-				"origin":            "",
-				"method":            "",
-				"header":            "",
-				"allow-credentials": true,
-				"expose-header":     "",
-				"max-age":           43200,
-			})
-		}
-		d.Provide(middleware.WebCors{})
-	}
-	d.Provide(system.Controller{})
-	return d
-}
-
-func (d *dio) MySQL(options ...gorm.Option) *dio {
-	mysql.SetOptions(options...)
-	if !d.HasProperty("mysql") {
-		d.SetDefaultProperty("mysql", map[string]interface{}{
-			"username": "root",
-			"password": "root",
-			"host":     "localhost",
-			"port":     3306,
-			"pool": map[string]interface{}{
-				"max-idle": 0,
-				"max-open": 0,
-			},
-			"log.level": 4,
-		})
-	}
-	d.Provide(mysql.GormConfiguration{})
-	d.Provide(mysql.GormLogger{})
 	return d
 }
 

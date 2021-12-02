@@ -4,7 +4,6 @@ import (
 	"context"
 	"embed"
 	"github.com/cheivin/di"
-	"gorm.io/gorm"
 	"os"
 )
 
@@ -92,13 +91,18 @@ func Run(ctx context.Context) {
 	g.Run(ctx)
 }
 
-func Web(useLogger, useCors bool) *dio {
-	return g.Web(useLogger, useCors)
+func Use(plugins ...PluginConfig) *dio {
+	return g.Use(plugins...)
 }
 
-func MySQL(options ...gorm.Option) *dio {
-	return g.MySQL(options...)
-}
+//
+//func Web(useLogger, useCors bool) *dio {
+//	return g.Web(useLogger, useCors)
+//}
+//
+//func MySQL(options ...gorm.Option) *dio {
+//	return g.MySQL(options...)
+//}
 
 func LoadDefaultConfig(configs embed.FS, filename string) *dio {
 	return g.LoadDefaultConfig(configs, filename)
