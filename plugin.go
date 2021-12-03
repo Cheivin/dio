@@ -3,7 +3,7 @@ package dio
 import (
 	"github.com/cheivin/dio/internal/mysql"
 	"github.com/cheivin/dio/internal/web"
-	"github.com/cheivin/dio/middleware"
+	"github.com/cheivin/dio/plugin/gin/middleware"
 	"github.com/cheivin/dio/system"
 	"gorm.io/gorm"
 )
