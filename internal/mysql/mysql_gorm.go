@@ -3,30 +3,32 @@ package mysql
 import (
 	"fmt"
 	"github.com/cheivin/di"
-	"github.com/cheivin/dio/plugin/mysql/dao"
+	"github.com/cheivin/dio/plugin/gorm/dao"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"net/url"
 	"time"
 )
 
-var opts []gorm.Option
+type GormOptions struct {
+	Options []gorm.Option
+}
 
-func SetOptions(options ...gorm.Option) {
-	opts = append(opts, options...)
+func (c *GormOptions) BeanName() string {
+	return "gormOptions"
 }
 
 type GormConfiguration struct {
-	Username    string `value:"mysql.username"`
-	Password    string `value:"mysql.password"`
-	Host        string `value:"mysql.host"`
-	Port        int    `value:"mysql.port"`
-	Database    string `value:"mysql.database"`
-	Parameters  string `value:"mysql.parameters"`
-	MaxIdle     int    `value:"mysql.pool.max-idle"`
-	MaxOpen     int    `value:"mysql.pool.max-open"`
-	MaxLifeTime string `value:"mysql.pool.max-life-time"`
-	MaxIdleTime string `value:"mysql.pool.max-idle-time"`
+	Username    string `value:"gorm.username"`
+	Password    string `value:"gorm.password"`
+	Host        string `value:"gorm.host"`
+	Port        int    `value:"gorm.port"`
+	Database    string `value:"gorm.database"`
+	Parameters  string `value:"gorm.parameters"`
+	MaxIdle     int    `value:"gorm.pool.max-idle"`
+	MaxOpen     int    `value:"gorm.pool.max-open"`
+	MaxLifeTime string `value:"gorm.pool.max-life-time"`
+	MaxIdleTime string `value:"gorm.pool.max-idle-time"`
 	db          *gorm.DB
 	Logger      *GormLogger `aware:""`
 }
@@ -46,6 +48,11 @@ func (c *GormConfiguration) parseParameters() {
 }
 
 func (c *GormConfiguration) BeanConstruct(container di.DI) {
+	var opts []gorm.Option
+	if options, ok := container.GetByType(GormOptions{}); ok {
+		opts = options.(*GormOptions).Options
+	}
+
 	c.parseParameters()
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s", []interface{}{
@@ -83,7 +90,7 @@ func (c *GormConfiguration) BeanConstruct(container di.DI) {
 	sqlDB.SetMaxOpenConns(c.MaxOpen)
 	// 注册db
 	c.db = db
-	container.RegisterNamedBean("mysql", db)
+	container.RegisterNamedBean("gorm", db)
 	baseDao := dao.New(db)
 	container.RegisterBean(baseDao)
 }

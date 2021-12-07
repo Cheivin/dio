@@ -3,7 +3,7 @@ package dao
 import (
 	"context"
 	"database/sql"
-	"github.com/cheivin/dio/plugin/mysql/wrapper"
+	"github.com/cheivin/dio/plugin/gorm/wrapper"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/utils"

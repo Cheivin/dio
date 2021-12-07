@@ -3,7 +3,7 @@ module github.com/cheivin/dio
 go 1.17
 
 require (
-	github.com/cheivin/di v0.1.2
+	github.com/cheivin/di v0.1.3
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.7.4
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible

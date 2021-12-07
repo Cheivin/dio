@@ -47,9 +47,8 @@ func Web(useLogger, useCors bool) PluginConfig {
 
 func MySQL(options ...gorm.Option) PluginConfig {
 	return func(d *dio) {
-		mysql.SetOptions(options...)
-		if !d.HasProperty("mysql") {
-			d.SetDefaultProperty("mysql", map[string]interface{}{
+		if !d.HasProperty("gorm") {
+			d.SetDefaultProperty("gorm", map[string]interface{}{
 				"username": "root",
 				"password": "root",
 				"host":     "localhost",
@@ -61,6 +60,7 @@ func MySQL(options ...gorm.Option) PluginConfig {
 				"log.level": 4,
 			})
 		}
+		d.RegisterBean(&mysql.GormOptions{Options: options})
 		d.Provide(mysql.GormConfiguration{})
 		d.Provide(mysql.GormLogger{})
 	}

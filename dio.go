@@ -113,8 +113,10 @@ func (d *dio) RegisterNamedBean(beanName string, beanInstance interface{}) *dio 
 	return d
 }
 
-func (d *dio) Provide(prototype interface{}) *dio {
-	d.ProvideNamedBean("", prototype)
+func (d *dio) Provide(prototype ...interface{}) *dio {
+	for _, bean := range prototype {
+		d.ProvideNamedBean("", bean)
+	}
 	return d
 }
 
@@ -122,11 +124,14 @@ func (d *dio) ProvideNamedBean(beanName string, prototype interface{}) *dio {
 	return d.ProvideNamedBeanOnProperty(beanName, prototype, "", "")
 }
 
-func (d *dio) ProvideOnProperty(prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
-	return d.ProvideNamedBeanOnProperty("", prototype, property, compareValue, caseInsensitive...)
+func (d *dio) ProvideMultiNamedBean(namedBeanMap map[string]interface{}) *dio {
+	for name, bean := range namedBeanMap {
+		d.ProvideNamedBean(name, bean)
+	}
+	return d
 }
 
-func (d *dio) ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
+func (d *dio) provideBeanCondition(beanName string, prototype interface{}, property string, compareValue string, needMatch bool, caseSensitive bool) *dio {
 	if d.loaded {
 		panic("dio is already run")
 	}
@@ -135,28 +140,53 @@ func (d *dio) ProvideNamedBeanOnProperty(beanName string, prototype interface{},
 			instance:        prototype,
 			property:        property,
 			compareValue:    compareValue,
-			needMatch:       true,
-			caseInsensitive: len(caseInsensitive) > 0 && caseInsensitive[0] == true,
+			needMatch:       needMatch,
+			caseInsensitive: !caseSensitive,
 		})
 	return d
 }
 
-func (d *dio) ProvideNotOnProperty(prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
-	return d.ProvideNamedBeanNotOnProperty("", prototype, property, compareValue, caseInsensitive...)
+func (d *dio) ProvideOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	return d.ProvideNamedBeanOnProperty("", prototype, property, compareValue, caseSensitive...)
 }
 
-func (d *dio) ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
-	if d.loaded {
-		panic("dio is already run")
+func (d *dio) ProvideMultiBeanOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	for _, bean := range beans {
+		d.ProvideOnProperty(bean, property, compareValue, caseSensitive...)
 	}
-	d.providedBeans = append(d.providedBeans,
-		bean{name: beanName,
-			instance:        prototype,
-			property:        property,
-			compareValue:    compareValue,
-			needMatch:       false,
-			caseInsensitive: len(caseInsensitive) > 0 && caseInsensitive[0] == true,
-		})
+	return d
+}
+
+func (d *dio) ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	return d.provideBeanCondition(beanName, prototype, property, compareValue, true, len(caseSensitive) > 0 && caseSensitive[0])
+}
+
+func (d *dio) ProvideMultiNamedBeanOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	for name, bean := range namedBeanMap {
+		d.ProvideNamedBeanOnProperty(name, bean, property, compareValue, caseSensitive...)
+	}
+	return d
+}
+
+func (d *dio) ProvideNotOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	return d.ProvideNamedBeanNotOnProperty("", prototype, property, compareValue, caseSensitive...)
+}
+
+func (d *dio) ProvideMultiBeanNotOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	for _, bean := range beans {
+		d.ProvideNotOnProperty(bean, property, compareValue, caseSensitive...)
+	}
+	return d
+}
+
+func (d *dio) ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	return d.provideBeanCondition(beanName, prototype, property, compareValue, false, len(caseSensitive) > 0 && caseSensitive[0])
+}
+
+func (d *dio) ProvideMultiNamedBeanNotOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	for name, bean := range namedBeanMap {
+		d.ProvideNamedBeanNotOnProperty(name, bean, property, compareValue, caseSensitive...)
+	}
 	return d
 }
 

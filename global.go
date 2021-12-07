@@ -59,28 +59,46 @@ func RegisterNamedBean(name string, bean interface{}) *dio {
 	return g.RegisterNamedBean(name, bean)
 }
 
-func Provide(prototype interface{}) *dio {
-	return g.Provide(prototype)
+func Provide(prototype ...interface{}) *dio {
+	return g.Provide(prototype...)
 }
 
 func ProvideNamedBean(beanName string, prototype interface{}) *dio {
 	return g.ProvideNamedBean(beanName, prototype)
 }
 
-func ProvideOnProperty(prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
-	return g.ProvideOnProperty(prototype, property, compareValue, caseInsensitive...)
+func ProvideMultiNamedBean(namedBeanMap map[string]interface{}) *dio {
+	return g.ProvideMultiNamedBean(namedBeanMap)
 }
 
-func ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
-	return g.ProvideNamedBeanOnProperty(beanName, prototype, property, compareValue, caseInsensitive...)
+func ProvideOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	return g.ProvideOnProperty(prototype, property, compareValue, caseSensitive...)
 }
 
-func ProvideNotOnProperty(prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
-	return g.ProvideNotOnProperty(prototype, property, compareValue, caseInsensitive...)
+func ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	return g.ProvideNamedBeanOnProperty(beanName, prototype, property, compareValue, caseSensitive...)
 }
 
-func ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseInsensitive ...bool) *dio {
-	return g.ProvideNamedBeanNotOnProperty(beanName, prototype, property, compareValue, caseInsensitive...)
+func ProvideMultiBeanOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	return g.ProvideMultiBeanOnProperty(beans, property, compareValue, caseSensitive...)
+}
+func ProvideMultiNamedBeanOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	return g.ProvideMultiNamedBeanOnProperty(namedBeanMap, property, compareValue, caseSensitive...)
+}
+
+func ProvideNotOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	return g.ProvideNotOnProperty(prototype, property, compareValue, caseSensitive...)
+}
+
+func ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	return g.ProvideNamedBeanNotOnProperty(beanName, prototype, property, compareValue, caseSensitive...)
+}
+
+func ProvideMultiBeanNotOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	return g.ProvideMultiBeanNotOnProperty(beans, property, compareValue, caseSensitive...)
+}
+func ProvideMultiNamedBeanNotOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+	return g.ProvideMultiNamedBeanNotOnProperty(namedBeanMap, property, compareValue, caseSensitive...)
 }
 
 func GetBean(beanName string) (bean interface{}, ok bool) {
@@ -94,15 +112,6 @@ func Run(ctx context.Context) {
 func Use(plugins ...PluginConfig) *dio {
 	return g.Use(plugins...)
 }
-
-//
-//func Web(useLogger, useCors bool) *dio {
-//	return g.Web(useLogger, useCors)
-//}
-//
-//func MySQL(options ...gorm.Option) *dio {
-//	return g.MySQL(options...)
-//}
 
 func LoadDefaultConfig(configs embed.FS, filename string) *dio {
 	return g.LoadDefaultConfig(configs, filename)
