@@ -13,7 +13,7 @@ import (
 
 type ginContainer struct {
 	Port   int         `value:"app.port"`
-	Log    *system.Log `aware:"log"`
+	Log    *system.Log `aware:""`
 	router *gin.Engine
 	server *http.Server
 }
