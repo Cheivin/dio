@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/cheivin/dio/errors"
+	"github.com/cheivin/dio/plugin/gin_web/errors"
 	"github.com/cheivin/dio/system"
 	"github.com/gin-gonic/gin"
 	"net/http"

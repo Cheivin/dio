@@ -92,7 +92,11 @@ func (l *Log) getLogEncoder() zapcore.Encoder {
 }
 
 func (l *Log) Skip(skip int) *Log {
-	logger := l.logger.Desugar().WithOptions(zap.AddCallerSkip(skip)).Sugar()
+	return l.WithOptions(zap.AddCallerSkip(skip))
+}
+
+func (l *Log) WithOptions(opts ...zap.Option) *Log {
+	logger := l.logger.Desugar().WithOptions(opts...).Sugar()
 	return &Log{
 		logger:    logger,
 		Name:      l.Name,

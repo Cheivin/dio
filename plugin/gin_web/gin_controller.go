@@ -1,13 +1,14 @@
-package system
+package web
 
 import (
+	"github.com/cheivin/dio/system"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type Controller struct {
 	Web *gin.Engine `aware:"web"`
-	Log *Log        `aware:""`
+	Log *system.Log `aware:""`
 }
 
 func (o *Controller) JsonView(fn func(*gin.Context) interface{}) gin.HandlerFunc {

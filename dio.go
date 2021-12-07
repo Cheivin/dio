@@ -53,24 +53,22 @@ func (b bean) matchProperty(d *dio) (match bool) {
 	}
 }
 
-const defaultTraceName = "X-Request-Id"
-
-func (d *dio) SetDefaultProperty(key string, value interface{}) *dio {
+func (d *dio) SetDefaultProperty(key string, value interface{}) Dio {
 	d.di.SetDefaultProperty(key, value)
 	return d
 }
 
-func (d *dio) SetDefaultPropertyMap(properties map[string]interface{}) *dio {
+func (d *dio) SetDefaultPropertyMap(properties map[string]interface{}) Dio {
 	d.di.SetDefaultPropertyMap(properties)
 	return d
 }
 
-func (d *dio) SetProperty(key string, value interface{}) *dio {
+func (d *dio) SetProperty(key string, value interface{}) Dio {
 	d.di.SetProperty(key, value)
 	return d
 }
 
-func (d *dio) SetPropertyMap(properties map[string]interface{}) *dio {
+func (d *dio) SetPropertyMap(properties map[string]interface{}) Dio {
 	d.di.SetPropertyMap(properties)
 	return d
 }
@@ -88,18 +86,20 @@ func (d *dio) GetPropertyString(property string) string {
 	}
 }
 
-func (d *dio) AutoMigrateEnv() *dio {
+func (d *dio) AutoMigrateEnv() Dio {
 	envMap := di.LoadEnvironment(strings.NewReplacer("_", "."), false)
 	d.SetPropertyMap(envMap)
 	return d
 }
 
-func (d *dio) RegisterBean(beanInstance interface{}) *dio {
-	d.RegisterNamedBean("", beanInstance)
+func (d *dio) RegisterBean(beanInstance ...interface{}) Dio {
+	for _, bean := range beanInstance {
+		d.RegisterNamedBean("", bean)
+	}
 	return d
 }
 
-func (d *dio) RegisterNamedBean(beanName string, beanInstance interface{}) *dio {
+func (d *dio) RegisterNamedBean(beanName string, beanInstance interface{}) Dio {
 	if d.loaded {
 		d.di.RegisterNamedBean(beanName, beanInstance)
 	} else {
@@ -113,25 +113,25 @@ func (d *dio) RegisterNamedBean(beanName string, beanInstance interface{}) *dio 
 	return d
 }
 
-func (d *dio) Provide(prototype ...interface{}) *dio {
+func (d *dio) Provide(prototype ...interface{}) Dio {
 	for _, bean := range prototype {
 		d.ProvideNamedBean("", bean)
 	}
 	return d
 }
 
-func (d *dio) ProvideNamedBean(beanName string, prototype interface{}) *dio {
+func (d *dio) ProvideNamedBean(beanName string, prototype interface{}) Dio {
 	return d.ProvideNamedBeanOnProperty(beanName, prototype, "", "")
 }
 
-func (d *dio) ProvideMultiNamedBean(namedBeanMap map[string]interface{}) *dio {
+func (d *dio) ProvideMultiNamedBean(namedBeanMap map[string]interface{}) Dio {
 	for name, bean := range namedBeanMap {
 		d.ProvideNamedBean(name, bean)
 	}
 	return d
 }
 
-func (d *dio) provideBeanCondition(beanName string, prototype interface{}, property string, compareValue string, needMatch bool, caseSensitive bool) *dio {
+func (d *dio) provideBeanCondition(beanName string, prototype interface{}, property string, compareValue string, needMatch bool, caseSensitive bool) Dio {
 	if d.loaded {
 		panic("dio is already run")
 	}
@@ -146,44 +146,44 @@ func (d *dio) provideBeanCondition(beanName string, prototype interface{}, prope
 	return d
 }
 
-func (d *dio) ProvideOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+func (d *dio) ProvideOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
 	return d.ProvideNamedBeanOnProperty("", prototype, property, compareValue, caseSensitive...)
 }
 
-func (d *dio) ProvideMultiBeanOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+func (d *dio) ProvideMultiBeanOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
 	for _, bean := range beans {
 		d.ProvideOnProperty(bean, property, compareValue, caseSensitive...)
 	}
 	return d
 }
 
-func (d *dio) ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+func (d *dio) ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
 	return d.provideBeanCondition(beanName, prototype, property, compareValue, true, len(caseSensitive) > 0 && caseSensitive[0])
 }
 
-func (d *dio) ProvideMultiNamedBeanOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+func (d *dio) ProvideMultiNamedBeanOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
 	for name, bean := range namedBeanMap {
 		d.ProvideNamedBeanOnProperty(name, bean, property, compareValue, caseSensitive...)
 	}
 	return d
 }
 
-func (d *dio) ProvideNotOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+func (d *dio) ProvideNotOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
 	return d.ProvideNamedBeanNotOnProperty("", prototype, property, compareValue, caseSensitive...)
 }
 
-func (d *dio) ProvideMultiBeanNotOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+func (d *dio) ProvideMultiBeanNotOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
 	for _, bean := range beans {
 		d.ProvideNotOnProperty(bean, property, compareValue, caseSensitive...)
 	}
 	return d
 }
 
-func (d *dio) ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+func (d *dio) ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
 	return d.provideBeanCondition(beanName, prototype, property, compareValue, false, len(caseSensitive) > 0 && caseSensitive[0])
 }
 
-func (d *dio) ProvideMultiNamedBeanNotOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) *dio {
+func (d *dio) ProvideMultiNamedBeanNotOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
 	for name, bean := range namedBeanMap {
 		d.ProvideNamedBeanNotOnProperty(name, bean, property, compareValue, caseSensitive...)
 	}
@@ -192,6 +192,10 @@ func (d *dio) ProvideMultiNamedBeanNotOnProperty(namedBeanMap map[string]interfa
 
 func (d *dio) GetBean(beanName string) (bean interface{}, ok bool) {
 	return d.di.GetBean(beanName)
+}
+
+func (d *dio) GetByType(beanType interface{}) (bean interface{}, ok bool) {
+	return d.di.GetByType(beanType)
 }
 
 func (d *dio) Run(ctx context.Context) {
@@ -226,14 +230,14 @@ func (d *dio) Run(ctx context.Context) {
 	d.di.Serve(ctx)
 }
 
-func (d *dio) Use(plugins ...PluginConfig) *dio {
+func (d *dio) Use(plugins ...PluginConfig) Dio {
 	for i := range plugins {
-		plugins[i](g)
+		plugins[i](d)
 	}
 	return d
 }
 
-func (d *dio) LoadDefaultConfig(configs embed.FS, filename string) *dio {
+func (d *dio) LoadDefaultConfig(configs embed.FS, filename string) Dio {
 	f, err := configs.Open(filename)
 	if err != nil {
 		panic(err)
@@ -247,10 +251,10 @@ func (d *dio) LoadDefaultConfig(configs embed.FS, filename string) *dio {
 		panic(err)
 	}
 	d.SetDefaultPropertyMap(configMap)
-	return g
+	return d
 }
 
-func (d *dio) LoadConfig(configs embed.FS, filename string) *dio {
+func (d *dio) LoadConfig(configs embed.FS, filename string) Dio {
 	f, err := configs.Open(filename)
 	if err != nil {
 		panic(err)
@@ -264,5 +268,5 @@ func (d *dio) LoadConfig(configs embed.FS, filename string) *dio {
 		panic(err)
 	}
 	d.SetPropertyMap(configMap)
-	return g
+	return d
 }

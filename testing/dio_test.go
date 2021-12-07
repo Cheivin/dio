@@ -5,6 +5,8 @@ import (
 	"embed"
 	"fmt"
 	"github.com/cheivin/dio"
+	web "github.com/cheivin/dio/plugin/gin_web"
+	orm "github.com/cheivin/dio/plugin/gorm"
 	"testing"
 )
 
@@ -17,7 +19,7 @@ func (A) BeanConstruct() {
 
 func TestRun(t *testing.T) {
 	dio.SetProperty("app.env", "dev")
-	dio.Use(dio.GinWeb(true, true), dio.Gorm()).
+	dio.Use(web.GinWeb(true, true), orm.Gorm()).
 		ProvideOnProperty(A{}, "app.env", "dev").
 		Run(context.Background())
 }
@@ -27,5 +29,5 @@ var configs embed.FS
 
 func TestYamlConfig(t *testing.T) {
 	dio.LoadConfig(configs, "configs/dev.yaml")
-	dio.Use(dio.GinWeb(true, true), dio.Gorm()).Run(context.Background())
+	dio.Use(web.GinWeb(true, true), orm.Gorm()).Run(context.Background())
 }
