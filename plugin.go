@@ -10,7 +10,7 @@ import (
 
 type PluginConfig func(d *dio)
 
-func Web(useLogger, useCors bool) PluginConfig {
+func GinWeb(useLogger, useCors bool) PluginConfig {
 	return func(d *dio) {
 		if !d.HasProperty("app.port") {
 			d.SetDefaultPropertyMap(map[string]interface{}{
@@ -45,7 +45,7 @@ func Web(useLogger, useCors bool) PluginConfig {
 	}
 }
 
-func MySQL(options ...gorm.Option) PluginConfig {
+func Gorm(options ...gorm.Option) PluginConfig {
 	return func(d *dio) {
 		if !d.HasProperty("gorm") {
 			d.SetDefaultProperty("gorm", map[string]interface{}{
