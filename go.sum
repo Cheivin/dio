@@ -18,6 +18,8 @@ github.com/cheivin/di v0.1.3-0.20211207080022-70e247bd188f h1:RyqjtBTd13d7rqBfFa
 github.com/cheivin/di v0.1.3-0.20211207080022-70e247bd188f/go.mod h1:Y2QRwodWnEq5LkWsEXXH8IsllkJX/UEz9jMVwZegego=
 github.com/cheivin/di v0.1.3 h1:XI12dagkXIgEpm1xFhd7jITPODcT1HE1zyDsnZUceME=
 github.com/cheivin/di v0.1.3/go.mod h1:Y2QRwodWnEq5LkWsEXXH8IsllkJX/UEz9jMVwZegego=
+github.com/cheivin/di v0.1.4-0.20211208081233-5ccb7150654f h1:D5pmww7UrxJ3PbODK/vIbo8ZlJ+YnhG//aIVRXfss7s=
+github.com/cheivin/di v0.1.4-0.20211208081233-5ccb7150654f/go.mod h1:Y2QRwodWnEq5LkWsEXXH8IsllkJX/UEz9jMVwZegego=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
