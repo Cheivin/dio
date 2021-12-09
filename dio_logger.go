@@ -6,6 +6,7 @@ import (
 	"github.com/cheivin/di"
 	"github.com/cheivin/dio/system"
 	"go.uber.org/zap"
+	"os"
 )
 
 type emptyLogger struct {
@@ -60,4 +61,5 @@ func (d dioLogger) Warn(s string) {
 
 func (d dioLogger) Fatal(s string) {
 	d.log.Error(s)
+	os.Exit(1)
 }

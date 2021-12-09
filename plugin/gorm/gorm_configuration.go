@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/cheivin/di"
 	"github.com/cheivin/dio/plugin/gorm/dao"
+	"github.com/cheivin/dio/system"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"net/url"
@@ -31,6 +32,7 @@ type GormConfiguration struct {
 	MaxIdleTime string `value:"gorm.pool.max-idle-time"`
 	db          *gorm.DB
 	Logger      *GormLogger `aware:""`
+	Log         *system.Log `aware:""`
 }
 
 func (c *GormConfiguration) BeanName() string {
@@ -96,10 +98,11 @@ func (c *GormConfiguration) BeanConstruct(container di.DI) {
 }
 
 // AfterPropertiesSet 注入完成时触发
-func (c *GormConfiguration) AfterPropertiesSet() {
+func (c *GormConfiguration) AfterPropertiesSet(container di.DI) {
 	db, _ := c.db.DB()
 	if err := db.Ping(); err != nil {
 		panic(err)
 	}
 	c.db.Logger = c.Logger
+	c.Log.Info(container.Context(), "Gorm library loaded")
 }

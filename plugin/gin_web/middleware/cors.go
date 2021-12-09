@@ -11,7 +11,7 @@ import (
 // WebCors 跨域
 type WebCors struct {
 	Web              *gin.Engine `aware:"web"`
-	Log              *system.Log `aware:"log"`
+	Log              *system.Log `aware:""`
 	Origins          string      `value:"app.web.cors.origin"`
 	Methods          string      `value:"app.web.cors.method"`
 	Headers          string      `value:"app.web.cors.header"`

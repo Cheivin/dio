@@ -73,6 +73,10 @@ func (l *Log) BeanConstruct() {
 	l.logger = zapLogger.Sugar()
 }
 
+func (l *Log) BeanName() string {
+	return "log"
+}
+
 func (l *Log) getLogEncoder() zapcore.Encoder {
 	return zapcore.NewConsoleEncoder(zapcore.EncoderConfig{
 		TimeKey:       "ts",

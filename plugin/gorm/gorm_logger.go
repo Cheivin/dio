@@ -13,7 +13,7 @@ type GormLogger struct {
 	Level                     int         `value:"gorm.log.level"`
 	SlowThreshold             string      `value:"gorm.log.slow-log"`
 	IgnoreRecordNotFoundError bool        `value:"gorm.log.ignore-notfound"`
-	Log                       *system.Log `aware:"log"`
+	Log                       *system.Log `aware:""`
 
 	slowThreshold time.Duration
 	level         logger.LogLevel

@@ -10,7 +10,7 @@ import (
 // WebRecover 全局异常
 type WebRecover struct {
 	Web        *gin.Engine `aware:"web"`
-	Log        *system.Log `aware:"log"`
+	Log        *system.Log `aware:""`
 	responseFn func(c *gin.Context, err errors.Error)
 }
 

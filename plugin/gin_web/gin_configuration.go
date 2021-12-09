@@ -31,20 +31,21 @@ func (w *ginContainer) BeanConstruct(container di.DI) {
 }
 
 // AfterPropertiesSet 注入完成时触发
-func (w *ginContainer) AfterPropertiesSet() {
+func (w *ginContainer) AfterPropertiesSet(container di.DI) {
 	w.server = &http.Server{
 		Handler: w.router,
 		Addr:    fmt.Sprintf(":%d", w.Port),
 	}
+	w.Log.Info(container.Context(), "Gin Web Container loaded")
 	w.Log = w.Log.WithOptions(zap.WithCaller(false))
 }
 
 // Initialized DI加载完成后，启动服务
 func (w *ginContainer) Initialized() {
 	go func() {
-		w.Log.Info(context.Background(), fmt.Sprintf("Gin Web ginContainer starting at port: %d", w.Port))
+		w.Log.Info(context.Background(), fmt.Sprintf("Gin Web Container starting at port: %d", w.Port))
 		if err := w.server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			w.Log.Error(context.Background(), "Gin Web ginContainer fatal", "error", err)
+			w.Log.Error(context.Background(), "Gin Web Container fatal", "error", err)
 			panic(err)
 		}
 	}()
@@ -56,6 +57,6 @@ func (w *ginContainer) Destroy() {
 	if err := w.server.Shutdown(ctx); err != nil {
 		w.Log.Error(ctx, "Server forced to shutdown", "error", err)
 	} else {
-		w.Log.Info(ctx, "Gin Web ginContainer shutdown")
+		w.Log.Info(ctx, "Gin Web Container shutdown")
 	}
 }
