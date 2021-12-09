@@ -3,7 +3,7 @@ module github.com/cheivin/dio
 go 1.17
 
 require (
-	github.com/cheivin/di v0.1.4-0.20211208081233-5ccb7150654f
+	github.com/cheivin/di v0.1.4
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	go.uber.org/zap v1.19.1
 	gopkg.in/yaml.v2 v2.4.0
