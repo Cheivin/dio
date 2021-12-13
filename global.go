@@ -3,29 +3,13 @@ package dio
 import (
 	"context"
 	"embed"
-	"github.com/cheivin/di"
 	"github.com/cheivin/dio-core"
-	"os"
 )
 
-var g *dioContainer
+var g dio.Dio
 
 func init() {
-	g = &dioContainer{di: di.New(), providedBeans: []bean{}, loaded: false}
-	g.di.Log(emptyLogger{})
-	logName := "dio_app"
-	if hostname, err := os.Hostname(); err == nil && hostname != "" {
-		logName += "_" + hostname
-	}
-	g.SetDefaultProperty("log", map[string]interface{}{
-		"name":       logName,
-		"dir":        "./logs",
-		"max-age":    30,
-		"debug":      true,
-		"std":        true,
-		"file":       true,
-		"trace-name": dio.DefaultTraceName,
-	})
+	g = New()
 }
 
 func SetDefaultProperty(key string, value interface{}) dio.Dio {

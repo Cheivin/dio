@@ -9,6 +9,7 @@ import (
 	"github.com/cheivin/dio-core/system"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"os"
 	"os/signal"
 	"strings"
 	"syscall"
@@ -28,6 +29,25 @@ type bean struct {
 	compareValue    string      // 条件载入配置比较值
 	caseInsensitive bool        // 条件载入配置比较值大小写敏感
 	registered      bool        // 是否为手动注册的bean
+}
+
+func New() dio.Dio {
+	container := &dioContainer{di: di.New(), providedBeans: []bean{}, loaded: false}
+	container.di.Log(emptyLogger{})
+	logName := "dio_app"
+	if hostname, err := os.Hostname(); err == nil && hostname != "" {
+		logName += "_" + hostname
+	}
+	container.SetDefaultProperty("log", map[string]interface{}{
+		"name":       logName,
+		"dir":        "./logs",
+		"max-age":    30,
+		"debug":      true,
+		"std":        true,
+		"file":       true,
+		"trace-name": dio.DefaultTraceName,
+	})
+	return container
 }
 
 func (b bean) matchProperty(d *dioContainer) (match bool) {
