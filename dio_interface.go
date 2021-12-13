@@ -48,6 +48,12 @@ type Dio interface {
 	// ProvideMultiNamedBean 根据map注册多个bean原型
 	ProvideMultiNamedBean(namedBeanMap map[string]interface{}) Dio
 
+	// OnProperty 按条件执行
+	OnProperty(property string, compareValue string, caseSensitive bool, fn func(Dio)) Dio
+
+	// NotOnProperty 按条件执行
+	NotOnProperty(property string, compareValue string, caseSensitive bool, fn func(Dio)) Dio
+
 	// ProvideOnProperty 按条件注册bean原型
 	ProvideOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) Dio
 

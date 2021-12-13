@@ -30,23 +30,27 @@ type bean struct {
 }
 
 func (b bean) matchProperty(d *dio) (match bool) {
+	return d.matchProperty(b.property, b.compareValue, b.needMatch, b.caseInsensitive)
+}
+
+func (d *dio) matchProperty(property string, compareValue string, needMatch bool, caseInsensitive bool) (match bool) {
 	// 空值表示未设定条件
-	if b.property == "" {
+	if property == "" {
 		return true
 	}
 	// 取出比较的属性值
-	val := d.di.Property().Get(b.property)
+	val := d.di.Property().Get(property)
 	if val == nil {
-		match = b.compareValue == ""
+		match = compareValue == ""
 	} else {
-		compareValue := fmt.Sprintf("%v", val)
-		if b.caseInsensitive {
-			match = strings.EqualFold(compareValue, b.compareValue)
+		propertyValue := fmt.Sprintf("%v", val)
+		if caseInsensitive {
+			match = strings.EqualFold(propertyValue, compareValue)
 		} else {
-			match = compareValue == b.compareValue
+			match = propertyValue == compareValue
 		}
 	}
-	if b.needMatch {
+	if needMatch {
 		return match
 	} else {
 		return !match
@@ -143,6 +147,20 @@ func (d *dio) provideBeanCondition(beanName string, prototype interface{}, prope
 			needMatch:       needMatch,
 			caseInsensitive: !caseSensitive,
 		})
+	return d
+}
+
+func (d *dio) OnProperty(property string, compareValue string, caseSensitive bool, fn func(Dio)) Dio {
+	if d.matchProperty(property, compareValue, true, !caseSensitive) {
+		fn(d)
+	}
+	return d
+}
+
+func (d *dio) NotOnProperty(property string, compareValue string, caseSensitive bool, fn func(Dio)) Dio {
+	if d.matchProperty(property, compareValue, false, !caseSensitive) {
+		fn(d)
+	}
 	return d
 }
 
