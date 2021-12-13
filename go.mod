@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/cheivin/di v0.1.4
-	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
+	github.com/cheivin/dio-core v0.0.0-20211213072630-2735f358bb8e
 	go.uber.org/zap v1.19.1
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -12,6 +12,7 @@ require (
 require (
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
+	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible // indirect
 	github.com/lestrrat-go/strftime v1.0.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect

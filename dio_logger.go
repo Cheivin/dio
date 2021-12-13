@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/cheivin/di"
-	"github.com/cheivin/dio/system"
+	"github.com/cheivin/dio-core/system"
 	"go.uber.org/zap"
 	"os"
 )

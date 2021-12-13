@@ -4,13 +4,14 @@ import (
 	"context"
 	"embed"
 	"github.com/cheivin/di"
+	"github.com/cheivin/dio-core"
 	"os"
 )
 
-var g *dio
+var g *dioContainer
 
 func init() {
-	g = &dio{di: di.New(), providedBeans: []bean{}, loaded: false}
+	g = &dioContainer{di: di.New(), providedBeans: []bean{}, loaded: false}
 	g.di.Log(emptyLogger{})
 	logName := "dio_app"
 	if hostname, err := os.Hostname(); err == nil && hostname != "" {
@@ -23,19 +24,19 @@ func init() {
 		"debug":      true,
 		"std":        true,
 		"file":       true,
-		"trace-name": DefaultTraceName,
+		"trace-name": dio.DefaultTraceName,
 	})
 }
 
-func SetDefaultProperty(key string, value interface{}) Dio {
+func SetDefaultProperty(key string, value interface{}) dio.Dio {
 	return g.SetDefaultProperty(key, value)
 }
 
-func SetDefaultPropertyMap(properties map[string]interface{}) Dio {
+func SetDefaultPropertyMap(properties map[string]interface{}) dio.Dio {
 	return g.SetDefaultPropertyMap(properties)
 }
 
-func SetProperty(key string, value interface{}) Dio {
+func SetProperty(key string, value interface{}) dio.Dio {
 	return g.SetProperty(key, value)
 }
 
@@ -43,61 +44,61 @@ func GetPropertyString(key string) string {
 	return g.GetPropertyString(key)
 }
 
-func SetPropertyMap(properties map[string]interface{}) Dio {
+func SetPropertyMap(properties map[string]interface{}) dio.Dio {
 	return g.SetPropertyMap(properties)
 }
 
-func AutoMigrateEnv() Dio {
+func AutoMigrateEnv() dio.Dio {
 	return g.AutoMigrateEnv()
 }
 
-func RegisterBean(bean interface{}) Dio {
+func RegisterBean(bean interface{}) dio.Dio {
 	return g.RegisterBean(bean)
 }
 
-func RegisterNamedBean(name string, bean interface{}) Dio {
+func RegisterNamedBean(name string, bean interface{}) dio.Dio {
 	return g.RegisterNamedBean(name, bean)
 }
 
-func Provide(prototype ...interface{}) Dio {
+func Provide(prototype ...interface{}) dio.Dio {
 	return g.Provide(prototype...)
 }
 
-func ProvideNamedBean(beanName string, prototype interface{}) Dio {
+func ProvideNamedBean(beanName string, prototype interface{}) dio.Dio {
 	return g.ProvideNamedBean(beanName, prototype)
 }
 
-func ProvideMultiNamedBean(namedBeanMap map[string]interface{}) Dio {
+func ProvideMultiNamedBean(namedBeanMap map[string]interface{}) dio.Dio {
 	return g.ProvideMultiNamedBean(namedBeanMap)
 }
 
-func ProvideOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
+func ProvideOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) dio.Dio {
 	return g.ProvideOnProperty(prototype, property, compareValue, caseSensitive...)
 }
 
-func ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
+func ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) dio.Dio {
 	return g.ProvideNamedBeanOnProperty(beanName, prototype, property, compareValue, caseSensitive...)
 }
 
-func ProvideMultiBeanOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
+func ProvideMultiBeanOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) dio.Dio {
 	return g.ProvideMultiBeanOnProperty(beans, property, compareValue, caseSensitive...)
 }
-func ProvideMultiNamedBeanOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
+func ProvideMultiNamedBeanOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) dio.Dio {
 	return g.ProvideMultiNamedBeanOnProperty(namedBeanMap, property, compareValue, caseSensitive...)
 }
 
-func ProvideNotOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
+func ProvideNotOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) dio.Dio {
 	return g.ProvideNotOnProperty(prototype, property, compareValue, caseSensitive...)
 }
 
-func ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
+func ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) dio.Dio {
 	return g.ProvideNamedBeanNotOnProperty(beanName, prototype, property, compareValue, caseSensitive...)
 }
 
-func ProvideMultiBeanNotOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
+func ProvideMultiBeanNotOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) dio.Dio {
 	return g.ProvideMultiBeanNotOnProperty(beans, property, compareValue, caseSensitive...)
 }
-func ProvideMultiNamedBeanNotOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) Dio {
+func ProvideMultiNamedBeanNotOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) dio.Dio {
 	return g.ProvideMultiNamedBeanNotOnProperty(namedBeanMap, property, compareValue, caseSensitive...)
 }
 
@@ -113,14 +114,14 @@ func Run(ctx context.Context) {
 	g.Run(ctx)
 }
 
-func Use(plugins ...PluginConfig) Dio {
+func Use(plugins ...dio.PluginConfig) dio.Dio {
 	return g.Use(plugins...)
 }
 
-func LoadDefaultConfig(configs embed.FS, filename string) Dio {
+func LoadDefaultConfig(configs embed.FS, filename string) dio.Dio {
 	return g.LoadDefaultConfig(configs, filename)
 }
 
-func LoadConfig(configs embed.FS, filename string) Dio {
+func LoadConfig(configs embed.FS, filename string) dio.Dio {
 	return g.LoadConfig(configs, filename)
 }
