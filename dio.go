@@ -237,7 +237,15 @@ func (d *dioContainer) GetByType(beanType interface{}) (bean interface{}, ok boo
 	return d.di.GetByType(beanType)
 }
 
-func (d *dioContainer) Run(ctx context.Context) {
+func (d *dioContainer) NewBean(beanType interface{}) (bean interface{}) {
+	return d.di.NewBean(beanType)
+}
+
+func (d *dioContainer) NewBeanByName(beanName string) (bean interface{}) {
+	return d.di.NewBeanByName(beanName)
+}
+
+func (d *dioContainer) Run(ctx context.Context, afterRunFns ...func(dio.Dio)) {
 	if d.loaded {
 		panic("dioContainer is already run")
 	}
@@ -266,6 +274,12 @@ func (d *dioContainer) Run(ctx context.Context) {
 
 	// 启动容器
 	d.di.Load()
+
+	// 容器加载完成后执行的方法
+	for i := range afterRunFns {
+		afterRunFns[i](d)
+	}
+
 	d.di.Serve(ctx)
 }
 
