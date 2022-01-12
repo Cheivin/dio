@@ -16,8 +16,7 @@ func (A) BeanConstruct() {
 }
 
 func TestRun(t *testing.T) {
-	dio.SetProperty("app.env", "dev")
-	dio.
+	dio.SetProperty("app.env", "dev").
 		ProvideOnProperty(A{}, "app.env", "dev").
 		Run(context.Background())
 }

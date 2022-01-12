@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/cheivin/di"
 	"github.com/cheivin/dio-core"
-	"github.com/cheivin/dio-core/system"
 	_ "github.com/kr/text"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -17,6 +16,7 @@ import (
 )
 
 type dioContainer struct {
+	log           core.Log
 	di            di.DI
 	providedBeans []bean
 	loaded        bool
@@ -119,6 +119,14 @@ func (d *dioContainer) GetProperties(prefix string, destType interface{}) interf
 func (d *dioContainer) AutoMigrateEnv() core.Dio {
 	envMap := di.LoadEnvironment(strings.NewReplacer("_", "."), false)
 	d.SetPropertyMap(envMap)
+	return d
+}
+
+func (d *dioContainer) Logger(log core.Log) core.Dio {
+	if d.loaded {
+		panic("dioContainer is already run")
+	}
+	d.log = log
 	return d
 }
 
@@ -256,9 +264,18 @@ func (d *dioContainer) Run(ctx context.Context, afterRunFns ...func(core.Dio)) {
 	}
 	d.loaded = true
 
+	if d.log == nil {
+		property := d.GetProperties("log", core.Property{}).(core.Property)
+		if log, err := NewZapLogger(property); err != nil {
+			panic(err)
+		} else {
+			d.log = log
+		}
+	}
+
 	// 配置日志组件
-	systemLog := d.di.NewBean(system.Log{}).(*system.Log)
-	dioLog := newDiLogger(ctx, systemLog)
+	systemLog := d.di.RegisterBean(d.log.Logger())
+	dioLog := newDiLogger(ctx, d.log)
 	d.di.Log(dioLog)
 	d.di.RegisterBean(systemLog)
 
