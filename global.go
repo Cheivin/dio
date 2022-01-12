@@ -36,6 +36,10 @@ func AutoMigrateEnv() core.Dio {
 	return g.AutoMigrateEnv()
 }
 
+func Logger(log core.Log) core.Dio {
+	return g.Logger(log)
+}
+
 func RegisterBean(bean interface{}) core.Dio {
 	return g.RegisterBean(bean)
 }
