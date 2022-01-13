@@ -127,6 +127,7 @@ func (d *dioContainer) SetLogger(log core.Log) core.Dio {
 		panic("dioContainer is already run")
 	}
 	d.log = log
+	d.di.RegisterBean(log)
 	return d
 }
 
@@ -271,6 +272,7 @@ func (d *dioContainer) Run(ctx context.Context, afterRunFns ...func(core.Dio)) {
 	}
 	d.loaded = true
 
+	// 配置日志组件
 	if d.log == nil {
 		property := d.GetProperties("log", core.Property{}).(core.Property)
 		if log, err := NewZapLogger(property); err != nil {
@@ -278,13 +280,10 @@ func (d *dioContainer) Run(ctx context.Context, afterRunFns ...func(core.Dio)) {
 		} else {
 			d.log = log
 		}
+		systemLog := d.di.RegisterBean(d.log)
+		d.di.RegisterBean(systemLog)
 	}
-
-	// 配置日志组件
-	systemLog := d.di.RegisterBean(d.log)
-	dioLog := newDiLogger(ctx, d.log)
-	d.di.Log(dioLog)
-	d.di.RegisterBean(systemLog)
+	d.di.Log(newDiLogger(ctx, d.log))
 
 	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
 	defer stop()

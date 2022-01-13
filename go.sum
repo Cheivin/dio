@@ -1,11 +1,9 @@
 github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLju8=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
-github.com/cheivin/di v0.1.5 h1:fAbIsw1SI9Fi344Cy6XsQEGK6T5yugDcVgypextbY5A=
-github.com/cheivin/di v0.1.5/go.mod h1:Y2QRwodWnEq5LkWsEXXH8IsllkJX/UEz9jMVwZegego=
-github.com/cheivin/dio-core v0.0.4-0.20220112144643-382210e08afe h1:2KJ0uVqyc79TrXAwmJgl9aZJC9DVS1Y80oHH6sUYvjI=
-github.com/cheivin/dio-core v0.0.4-0.20220112144643-382210e08afe/go.mod h1:56DnELkq5Nu5kbOoEiP7TW7NPFgfYPjLby5RuMn1nyQ=
-github.com/cheivin/dio-core v0.0.4-0.20220112150751-87f411f660e8 h1:inBrsk6iHCVRLOE6T/ZhDSR+RjAXtJbogP2KeB6/G8U=
-github.com/cheivin/dio-core v0.0.4-0.20220112150751-87f411f660e8/go.mod h1:56DnELkq5Nu5kbOoEiP7TW7NPFgfYPjLby5RuMn1nyQ=
+github.com/cheivin/di v0.1.6 h1:5fdFLHI7GQF4vu4xQqup2QoEbA4hx109baLEhBQTrbg=
+github.com/cheivin/di v0.1.6/go.mod h1:Y2QRwodWnEq5LkWsEXXH8IsllkJX/UEz9jMVwZegego=
+github.com/cheivin/dio-core v0.0.4 h1:RbvjPfng1cn5xsQI1seouqy0DxwSEcKhhbc4YW25rNk=
+github.com/cheivin/dio-core v0.0.4/go.mod h1:56DnELkq5Nu5kbOoEiP7TW7NPFgfYPjLby5RuMn1nyQ=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
