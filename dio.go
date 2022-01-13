@@ -274,7 +274,7 @@ func (d *dioContainer) Run(ctx context.Context, afterRunFns ...func(core.Dio)) {
 
 	// 配置日志组件
 	if d.log == nil {
-		property := d.GetProperties("log", core.Property{}).(core.Property)
+		property := d.GetProperties("log.", core.Property{}).(core.Property)
 		if log, err := NewZapLogger(property); err != nil {
 			panic(err)
 		} else {

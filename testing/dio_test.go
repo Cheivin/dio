@@ -10,10 +10,15 @@ import (
 )
 
 type A struct {
+	Log core.Log `aware:""`
 }
 
 func (A) BeanConstruct() {
 	fmt.Println("Load A")
+}
+
+func (a A) AfterPropertiesSet() {
+	a.Log.Info(context.Background(), "加载完成")
 }
 
 func TestRun(t *testing.T) {
@@ -31,7 +36,7 @@ func TestYamlConfig(t *testing.T) {
 }
 
 func Test_GetByType(t *testing.T) {
-	property := dio.GetProperties("log", core.Property{}).(core.Property)
+	property := dio.GetProperties("log.", core.Property{}).(core.Property)
 	log, err := dio.NewZapLogger(property)
 	if err != nil {
 		t.Fatal(err)

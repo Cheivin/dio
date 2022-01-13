@@ -157,7 +157,7 @@ func (l *ZapLogger) Skip(skip int) core.Log {
 	if skip <= 0 {
 		return WrapZapLogger(l.logger.Desugar().WithOptions(zap.WithCaller(false)))
 	} else {
-		return WrapZapLogger(l.logger.Desugar().WithOptions(zap.AddCallerSkip(skip)))
+		return WrapZapLogger(l.logger.Desugar().WithOptions(zap.WithCaller(true), zap.AddCallerSkip(skip)))
 	}
 }
 
