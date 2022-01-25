@@ -63,9 +63,9 @@ func NewZapLogger(l core.Property, opts ...zap.Option) (core.Log, error) {
 		if errorWriter, err := getLogWriter(path.Join(l.Dir, l.Name)+"_error.log", time.Duration(l.MaxAge)*time.Hour*24); err != nil {
 			return nil, err
 		} else {
-			zapcore.NewCore(getLogEncoder(), zapcore.AddSync(errorWriter), zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+			cores = append(cores, zapcore.NewCore(getLogEncoder(), zapcore.AddSync(errorWriter), zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 				return lvl >= zapcore.ErrorLevel
-			}))
+			})))
 		}
 	}
 	// 输出到控制台,
