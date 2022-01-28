@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/cheivin/di v0.1.6
-	github.com/cheivin/dio-core v0.0.4
+	github.com/cheivin/dio-core v0.0.4-patch1
 	github.com/kr/text v0.2.0
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	go.uber.org/zap v1.19.1

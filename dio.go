@@ -2,12 +2,12 @@ package dio
 
 import (
 	"context"
-	"embed"
 	"fmt"
 	"github.com/cheivin/di"
 	"github.com/cheivin/dio-core"
 	_ "github.com/kr/text"
 	"gopkg.in/yaml.v2"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"os/signal"
@@ -285,7 +285,7 @@ func (d *dioContainer) Run(ctx context.Context, afterRunFns ...func(core.Dio)) {
 	}
 	d.di.Log(newDiLogger(ctx, d.log))
 
-	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
+	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
 	defer stop()
 
 	// 配置bean
@@ -318,7 +318,7 @@ func (d *dioContainer) Use(plugins ...core.PluginConfig) core.Dio {
 	return d
 }
 
-func (d *dioContainer) LoadDefaultConfig(configs embed.FS, filename string) core.Dio {
+func (d *dioContainer) LoadDefaultConfig(configs fs.FS, filename string) core.Dio {
 	f, err := configs.Open(filename)
 	if err != nil {
 		panic(err)
@@ -335,7 +335,7 @@ func (d *dioContainer) LoadDefaultConfig(configs embed.FS, filename string) core
 	return d
 }
 
-func (d *dioContainer) LoadConfig(configs embed.FS, filename string) core.Dio {
+func (d *dioContainer) LoadConfig(configs fs.FS, filename string) core.Dio {
 	f, err := configs.Open(filename)
 	if err != nil {
 		panic(err)
