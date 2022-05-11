@@ -10,7 +10,8 @@ import (
 )
 
 type A struct {
-	Log core.Log `aware:""`
+	Log       core.Log `aware:""`
+	Container core.Dio `aware:""`
 }
 
 func (A) BeanConstruct() {
@@ -19,6 +20,7 @@ func (A) BeanConstruct() {
 
 func (a A) AfterPropertiesSet() {
 	a.Log.Info(context.Background(), "加载完成")
+	a.Container.Logger().Info(context.TODO(), "Container")
 }
 
 func TestRun(t *testing.T) {

@@ -266,11 +266,17 @@ func (d *dioContainer) NewBeanByName(beanName string) (bean interface{}) {
 	return d.di.NewBeanByName(beanName)
 }
 
+func (d *dioContainer) BeanName() string {
+	return "dioContainer"
+}
+
 func (d *dioContainer) Run(ctx context.Context, afterRunFns ...func(core.Dio)) {
 	if d.loaded {
 		panic("dioContainer is already run")
 	}
 	d.loaded = true
+
+	d.di.RegisterBean(d)
 
 	// 配置日志组件
 	if d.log == nil {
