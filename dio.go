@@ -7,6 +7,7 @@ import (
 	"github.com/cheivin/di"
 	"github.com/cheivin/dio-core"
 	"github.com/cheivin/dio-core/system"
+	_ "github.com/kr/text"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
