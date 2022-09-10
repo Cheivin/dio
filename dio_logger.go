@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/cheivin/di"
-	"github.com/cheivin/dio-core/system"
-	"go.uber.org/zap"
+	"github.com/cheivin/dio-core"
 	"os"
 )
 
@@ -30,36 +29,33 @@ func (e emptyLogger) Fatal(s string) {
 
 type dioLogger struct {
 	ctx context.Context
-	log *zap.Logger
+	log core.Log
 }
 
-func newDiLogger(ctx context.Context, log *system.Log) di.Log {
+func newDiLogger(ctx context.Context, log core.Log) di.Log {
 	fmt.Println(" ____    ______   _____      \n/\\  _`\\ /\\__  _\\ /\\  __`\\    \n\\ \\ \\/\\ \\/_/\\ \\/ \\ \\ \\/\\ \\   \n \\ \\ \\ \\ \\ \\ \\ \\  \\ \\ \\ \\ \\  \n  \\ \\ \\_\\ \\ \\_\\ \\__\\ \\ \\_\\ \\ \n   \\ \\____/ /\\_____\\\\ \\_____\\\n    \\/___/  \\/_____/ \\/_____/")
 	return dioLogger{
 		ctx: ctx,
-		log: log.Logger().Named("[DIO]").WithOptions(zap.WithCaller(false)),
+		log: log.Named("[DIO]").Skip(0),
 	}
 }
 
-func (d dioLogger) DebugMode(b bool) {
-	if b {
-		d.log = d.log.WithOptions(zap.Development())
-	}
+func (d dioLogger) DebugMode(_ bool) {
 }
 
 func (d dioLogger) Debug(s string) {
-	d.log.Debug(s)
+	d.log.Debug(context.Background(), s)
 }
 
 func (d dioLogger) Info(s string) {
-	d.log.Info(s)
+	d.log.Info(context.Background(), s)
 }
 
 func (d dioLogger) Warn(s string) {
-	d.log.Warn(s)
+	d.log.Warn(context.Background(), s)
 }
 
 func (d dioLogger) Fatal(s string) {
-	d.log.Error(s)
+	d.log.Error(context.Background(), s)
 	os.Exit(1)
 }

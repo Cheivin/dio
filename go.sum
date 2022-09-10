@@ -2,8 +2,8 @@ github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLj
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/cheivin/di v0.1.5 h1:fAbIsw1SI9Fi344Cy6XsQEGK6T5yugDcVgypextbY5A=
 github.com/cheivin/di v0.1.5/go.mod h1:Y2QRwodWnEq5LkWsEXXH8IsllkJX/UEz9jMVwZegego=
-github.com/cheivin/dio-core v0.0.3 h1:kGL4jdEH/KSRkYlP8hoUBtisOyx0e2qUVDe3mI0NdDs=
-github.com/cheivin/dio-core v0.0.3/go.mod h1:VRhBhR9Fq0SKx6YI1nlA3e99+yOXoYYRp7C/NeCd4ug=
+github.com/cheivin/dio-core v0.0.4-0.20220112144643-382210e08afe h1:2KJ0uVqyc79TrXAwmJgl9aZJC9DVS1Y80oHH6sUYvjI=
+github.com/cheivin/dio-core v0.0.4-0.20220112144643-382210e08afe/go.mod h1:56DnELkq5Nu5kbOoEiP7TW7NPFgfYPjLby5RuMn1nyQ=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
