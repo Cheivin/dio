@@ -274,7 +274,7 @@ func (d *dioContainer) Run(ctx context.Context, afterRunFns ...func(core.Dio)) {
 	}
 
 	// 配置日志组件
-	systemLog := d.di.RegisterBean(d.log.Logger())
+	systemLog := d.di.RegisterBean(d.log)
 	dioLog := newDiLogger(ctx, d.log)
 	d.di.Log(dioLog)
 	d.di.RegisterBean(systemLog)
