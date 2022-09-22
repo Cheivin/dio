@@ -122,12 +122,19 @@ func (d *dioContainer) AutoMigrateEnv() core.Dio {
 	return d
 }
 
-func (d *dioContainer) Logger(log core.Log) core.Dio {
+func (d *dioContainer) SetLogger(log core.Log) core.Dio {
 	if d.loaded {
 		panic("dioContainer is already run")
 	}
 	d.log = log
 	return d
+}
+
+func (d *dioContainer) Logger() core.Log {
+	if !d.loaded {
+		panic("dioContainer not run")
+	}
+	return d.log
 }
 
 func (d *dioContainer) RegisterBean(beanInstance ...interface{}) core.Dio {
