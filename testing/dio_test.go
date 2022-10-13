@@ -5,6 +5,7 @@ import (
 	"embed"
 	"fmt"
 	"github.com/cheivin/dio"
+	"github.com/cheivin/dio-core"
 	"testing"
 )
 
@@ -27,4 +28,16 @@ var configs embed.FS
 func TestYamlConfig(t *testing.T) {
 	dio.LoadConfig(configs, "configs/dev.yaml")
 	dio.Run(context.Background())
+}
+
+func Test_GetByType(t *testing.T) {
+	property := dio.GetProperties("log", core.Property{}).(core.Property)
+	log, err := dio.NewZapLogger(property)
+	if err != nil {
+		t.Fatal(err)
+	}
+	dio.SetLogger(log)
+
+	var x core.Log
+	t.Log(dio.GetByType(&x))
 }

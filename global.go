@@ -28,6 +28,10 @@ func GetPropertyString(key string) string {
 	return g.GetPropertyString(key)
 }
 
+func GetProperties(prefix string, destType interface{}) interface{} {
+	return g.GetProperties(prefix, destType)
+}
+
 func SetPropertyMap(properties map[string]interface{}) core.Dio {
 	return g.SetPropertyMap(properties)
 }
