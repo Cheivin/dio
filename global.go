@@ -2,8 +2,8 @@ package dio
 
 import (
 	"context"
-	"embed"
 	"github.com/cheivin/dio-core"
+	"io/fs"
 )
 
 var g core.Dio
@@ -114,10 +114,10 @@ func Use(plugins ...core.PluginConfig) core.Dio {
 	return g.Use(plugins...)
 }
 
-func LoadDefaultConfig(configs embed.FS, filename string) core.Dio {
+func LoadDefaultConfig(configs fs.FS, filename string) core.Dio {
 	return g.LoadDefaultConfig(configs, filename)
 }
 
-func LoadConfig(configs embed.FS, filename string) core.Dio {
+func LoadConfig(configs fs.FS, filename string) core.Dio {
 	return g.LoadConfig(configs, filename)
 }
