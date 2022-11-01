@@ -149,16 +149,20 @@ func (l *ZapLogger) BeanName() string {
 	return "log"
 }
 
-func (l *ZapLogger) Named(named string) core.Log {
-	return WrapZapLogger(l.logger.Desugar().Named(named))
+func (l *ZapLogger) Named(named string) (logger core.Log) {
+	logger = WrapZapLogger(l.logger.Desugar().Named(named))
+	logger.(*ZapLogger).traceName = l.traceName
+	return
 }
 
-func (l *ZapLogger) Skip(skip int) core.Log {
+func (l *ZapLogger) Skip(skip int) (logger core.Log) {
 	if skip <= 0 {
-		return WrapZapLogger(l.logger.Desugar().WithOptions(zap.WithCaller(false)))
+		logger = WrapZapLogger(l.logger.Desugar().WithOptions(zap.WithCaller(false)))
 	} else {
-		return WrapZapLogger(l.logger.Desugar().WithOptions(zap.WithCaller(true), zap.AddCallerSkip(skip)))
+		logger = WrapZapLogger(l.logger.Desugar().WithOptions(zap.WithCaller(true), zap.AddCallerSkip(skip)))
 	}
+	logger.(*ZapLogger).traceName = l.traceName
+	return
 }
 
 func (l *ZapLogger) Logger() interface{} {
