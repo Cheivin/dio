@@ -185,6 +185,11 @@ func (l *ZapLogger) Trace(ctx context.Context) context.Context {
 	return ctx
 }
 
+func (l *ZapLogger) TraceWith(ctx context.Context, val any) context.Context {
+	ctx = context.WithValue(ctx, l.traceName, val)
+	return ctx
+}
+
 func (l *ZapLogger) map2slice(keyAndValues ...map[string]interface{}) (fields []interface{}) {
 	if len(keyAndValues) == 0 {
 		return nil
