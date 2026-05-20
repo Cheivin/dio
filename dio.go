@@ -3,16 +3,16 @@ package dio
 import (
 	"context"
 	"fmt"
-	"github.com/cheivin/di"
-	"github.com/cheivin/dio-core"
-	_ "github.com/kr/text"
-	"gopkg.in/yaml.v2"
+	"io"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
+
+	"github.com/cheivin/di"
+	"github.com/cheivin/dio-core"
+	"gopkg.in/yaml.v2"
 )
 
 type dioContainer struct {
@@ -286,12 +286,11 @@ func (d *dioContainer) Run(ctx context.Context, afterRunFns ...func(core.Dio)) {
 		} else {
 			d.log = log
 		}
-		systemLog := d.di.RegisterBean(d.log)
-		d.di.RegisterBean(systemLog)
+		d.di.RegisterBean(d.log)
 	}
 	d.di.Log(newDiLogger(ctx, d.log))
 
-	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
+	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
 	// 配置bean
@@ -329,7 +328,8 @@ func (d *dioContainer) LoadDefaultConfig(configs fs.FS, filename string) core.Di
 	if err != nil {
 		panic(err)
 	}
-	data, err := ioutil.ReadAll(f)
+	defer f.Close()
+	data, err := io.ReadAll(f)
 	if err != nil {
 		panic(err)
 	}
@@ -346,7 +346,8 @@ func (d *dioContainer) LoadConfig(configs fs.FS, filename string) core.Dio {
 	if err != nil {
 		panic(err)
 	}
-	data, err := ioutil.ReadAll(f)
+	defer f.Close()
+	data, err := io.ReadAll(f)
 	if err != nil {
 		panic(err)
 	}

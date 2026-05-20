@@ -4,9 +4,10 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"testing"
+
 	"github.com/cheivin/dio"
 	"github.com/cheivin/dio-core"
-	"testing"
 )
 
 type A struct {

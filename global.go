@@ -2,8 +2,9 @@ package dio
 
 import (
 	"context"
-	"github.com/cheivin/dio-core"
 	"io/fs"
+
+	"github.com/cheivin/dio-core"
 )
 
 var g core.Dio

@@ -3,9 +3,10 @@ package dio
 import (
 	"context"
 	"fmt"
+	"os"
+
 	"github.com/cheivin/di"
 	"github.com/cheivin/dio-core"
-	"os"
 )
 
 type emptyLogger struct {

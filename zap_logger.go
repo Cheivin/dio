@@ -2,14 +2,15 @@ package dio
 
 import (
 	"context"
-	"github.com/cheivin/dio-core"
-	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/cheivin/dio-core"
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type ZapLogger struct {
