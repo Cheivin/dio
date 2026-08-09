@@ -79,6 +79,7 @@ func main() {
 - [全局函数与独立容器](others/global) — API 边界与 Reset
 - [日志配置](others/log) — Zap 日志与请求追踪
 - [错误处理](others/errors) — 错误哨兵与 errors.Is
+- [升级指南](others/upgrade-guide) — 旧版本升级的破坏性变更与迁移
 
 ### 参考
 

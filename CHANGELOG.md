@@ -28,6 +28,7 @@
 
 - `yaml.v2` → `yaml.v3`（嵌套 map 解析为 `map[string]any`，van 兼容）
 - 升级 di v0.6.2 / dio-core v0.6.2，版本号对齐
+- ⚠️ 升级注意：`LoadConfig` 公共配置优先级调整为 SetDefault 级（profile 覆盖用 Set 级），`SetProperty` 之后调用 `LoadConfig` 的覆盖预期有变；旧版本升级的完整破坏性变更清单见 [升级指南](https://cheivin.github.io/dio/others/upgrade-guide)
 
 ## [0.3.0] - 2026-08-09
 
