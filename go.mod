@@ -20,8 +20,5 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
 
-// 本地开发：指向本地源码。发布后移除。
-replace (
-	github.com/cheivin/di => ../di
-	github.com/cheivin/dio-core => ../dio-core
-)
+// v0.6.2 误引用未发布的 dio-core v0.6.1 且含本地 replace 指令，proxy 已缓存不可修复，请使用 v0.6.3。
+retract v0.6.2

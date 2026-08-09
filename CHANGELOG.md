@@ -2,6 +2,13 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [0.6.3] - 2026-08-09
+
+### 修复
+
+- **移除 go.mod 中的本地 replace 指令**：发布物不再包含开发期指向本地源码（`../di`、`../dio-core`）的 replace
+- **retract v0.6.2**：v0.6.2 的 go.mod 误引用未发布的 dio-core v0.6.1 且含本地 replace，Go proxy 已缓存该坏版本且不可刷新，已通过 `retract v0.6.2` 标记。请使用 v0.6.3。
+
 ## [0.6.2] - 2026-08-09
 
 版本号对齐 di v0.6.2（dio 系列统一对齐 di 的主次版本号）；升级 di v0.6.2 / dio-core v0.6.2。
