@@ -4,7 +4,7 @@ go 1.25
 
 require (
 	github.com/cheivin/di v0.6.2
-	github.com/cheivin/dio-core v0.6.1
+	github.com/cheivin/dio-core v0.6.2
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	go.uber.org/zap v1.28.0
 	gopkg.in/yaml.v3 v3.0.1
