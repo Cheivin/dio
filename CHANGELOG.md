@@ -2,7 +2,7 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
-## [0.2.0] - 2026-08-09
+## [0.3.0] - 2026-08-09
 
 ### Breaking Changes
 
@@ -17,6 +17,10 @@
 - 全局容器懒初始化（首次调用才创建），新增 `dio.Reset()` 测试隔离
 - 修复测试阻塞问题：`Run(context.Background())` 改为可取消 ctx
 - README 补充完整文档
+
+## [0.2.0]
+
+- 修复日志重复注册问题
 
 ## [0.1.1]
 
