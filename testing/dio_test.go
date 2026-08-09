@@ -54,7 +54,7 @@ func TestRun(t *testing.T) {
 	})
 }
 
-//go:embed configs/*.yaml
+//go:embed configs/*
 var configs embed.FS
 
 func TestYamlConfig(t *testing.T) {

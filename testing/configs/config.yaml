@@ -1,0 +1,5 @@
+app:
+  name: base-app
+  env: prod
+feature:
+  enable: false

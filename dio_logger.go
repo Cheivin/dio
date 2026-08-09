@@ -2,7 +2,6 @@ package dio
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cheivin/di"
 	"github.com/cheivin/dio-core"
@@ -27,20 +26,20 @@ func (e emptyLogger) Fatal(err error) {
 	panic(err)
 }
 
+// dioLogger 适配 di.Log 到 core.Log：di 的日志方法无 context 参数，
+// 这里统一用 Background()（容器内部日志无请求上下文）。
 type dioLogger struct {
-	ctx context.Context
 	log core.Log
 }
 
-func newDiLogger(ctx context.Context, log core.Log) di.Log {
-	fmt.Println(" ____    ______   _____      \n/\\  _`\\ /\\__  _\\ /\\  __`\\    \n\\ \\ \\/\\ \\/_/\\ \\/ \\ \\ \\/\\ \\   \n \\ \\ \\ \\ \\ \\ \\ \\  \\ \\ \\ \\ \\  \n  \\ \\ \\_\\ \\ \\_\\ \\__\\ \\ \\_\\ \\ \n   \\ \\____/ /\\_____\\\\ \\_____\\\n    \\/___/  \\/_____/ \\/_____/")
+func newDiLogger(log core.Log) di.Log {
 	return dioLogger{
-		ctx: ctx,
 		log: log.Named("[DIO]").Skip(0),
 	}
 }
 
 func (d dioLogger) DebugMode(_ bool) {
+	// di 的 DebugMode 对 dio 无意义：dio 的调试级别由 zap 的 log.debug 配置控制
 }
 
 func (d dioLogger) Debug(s string) {
