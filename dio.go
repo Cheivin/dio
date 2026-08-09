@@ -24,7 +24,7 @@ type dioContainer struct {
 
 type bean struct {
 	name            string      // 名称
-	instance        interface{} // 实例
+	instance        any // 实例
 	needMatch       bool        // 是否条件载入
 	property        string      // 条件载入配置项
 	compareValue    string      // 条件载入配置比较值
@@ -39,7 +39,7 @@ func New() core.Dio {
 	if hostname, err := os.Hostname(); err == nil && hostname != "" {
 		logName += "_" + hostname
 	}
-	container.SetDefaultProperty("log", map[string]interface{}{
+	container.SetDefaultProperty("log", map[string]any{
 		"name":       logName,
 		"dir":        "./logs",
 		"max-age":    30,
@@ -79,22 +79,22 @@ func (d *dioContainer) matchProperty(property string, compareValue string, needM
 	}
 }
 
-func (d *dioContainer) SetDefaultProperty(key string, value interface{}) core.Dio {
+func (d *dioContainer) SetDefaultProperty(key string, value any) core.Dio {
 	d.di.SetDefaultProperty(key, value)
 	return d
 }
 
-func (d *dioContainer) SetDefaultPropertyMap(properties map[string]interface{}) core.Dio {
+func (d *dioContainer) SetDefaultPropertyMap(properties map[string]any) core.Dio {
 	d.di.SetDefaultPropertyMap(properties)
 	return d
 }
 
-func (d *dioContainer) SetProperty(key string, value interface{}) core.Dio {
+func (d *dioContainer) SetProperty(key string, value any) core.Dio {
 	d.di.SetProperty(key, value)
 	return d
 }
 
-func (d *dioContainer) SetPropertyMap(properties map[string]interface{}) core.Dio {
+func (d *dioContainer) SetPropertyMap(properties map[string]any) core.Dio {
 	d.di.SetPropertyMap(properties)
 	return d
 }
@@ -112,13 +112,12 @@ func (d *dioContainer) GetPropertyString(property string) string {
 	}
 }
 
-func (d *dioContainer) GetProperties(prefix string, destType interface{}) interface{} {
+func (d *dioContainer) GetProperties(prefix string, destType any) any {
 	return d.di.LoadProperties(prefix, destType)
 }
 
 func (d *dioContainer) AutoMigrateEnv() core.Dio {
-	envMap := di.LoadEnvironment(strings.NewReplacer("_", "."), false)
-	d.SetPropertyMap(envMap)
+	d.di.AutoMigrateEnv()
 	return d
 }
 
@@ -138,14 +137,14 @@ func (d *dioContainer) Logger() core.Log {
 	return d.log
 }
 
-func (d *dioContainer) RegisterBean(beanInstance ...interface{}) core.Dio {
+func (d *dioContainer) RegisterBean(beanInstance ...any) core.Dio {
 	for _, bean := range beanInstance {
 		d.RegisterNamedBean("", bean)
 	}
 	return d
 }
 
-func (d *dioContainer) RegisterNamedBean(beanName string, beanInstance interface{}) core.Dio {
+func (d *dioContainer) RegisterNamedBean(beanName string, beanInstance any) core.Dio {
 	if d.loaded {
 		d.di.RegisterNamedBean(beanName, beanInstance)
 	} else {
@@ -159,25 +158,45 @@ func (d *dioContainer) RegisterNamedBean(beanName string, beanInstance interface
 	return d
 }
 
-func (d *dioContainer) Provide(prototype ...interface{}) core.Dio {
+func (d *dioContainer) Provide(prototype ...any) core.Dio {
 	for _, bean := range prototype {
 		d.ProvideNamedBean("", bean)
 	}
 	return d
 }
 
-func (d *dioContainer) ProvideNamedBean(beanName string, prototype interface{}) core.Dio {
-	return d.ProvideNamedBeanOnProperty(beanName, prototype, "", "")
+func (d *dioContainer) ProvideNamedBean(beanName string, prototype any) core.Dio {
+	return d.ProvideNamedBeanOnProperty("", prototype, "", "")
 }
 
-func (d *dioContainer) ProvideMultiNamedBean(namedBeanMap map[string]interface{}) core.Dio {
+func (d *dioContainer) ProvideFunc(fn any) core.Dio {
+	if d.loaded {
+		panic("dioContainer is already run")
+	}
+	d.di.ProvideFunc(fn)
+	return d
+}
+
+// WithCircularCheck 开启/关闭循环依赖检测，转发到底层 di 容器
+func (d *dioContainer) WithCircularCheck(enable bool) core.Dio {
+	d.di.WithCircularCheck(enable)
+	return d
+}
+
+// WithBeanSelector 设置接口多实现选择策略，转发到底层 di 容器
+func (d *dioContainer) WithBeanSelector(s di.BeanSelector) core.Dio {
+	d.di.WithBeanSelector(s)
+	return d
+}
+
+func (d *dioContainer) ProvideMultiNamedBean(namedBeanMap map[string]any) core.Dio {
 	for name, bean := range namedBeanMap {
 		d.ProvideNamedBean(name, bean)
 	}
 	return d
 }
 
-func (d *dioContainer) provideBeanCondition(beanName string, prototype interface{}, property string, compareValue string, needMatch bool, caseSensitive bool) core.Dio {
+func (d *dioContainer) provideBeanCondition(beanName string, prototype any, property string, compareValue string, needMatch bool, caseSensitive bool) core.Dio {
 	if d.loaded {
 		panic("dioContainer is already run")
 	}
@@ -206,63 +225,63 @@ func (d *dioContainer) NotOnProperty(property string, compareValue string, caseS
 	return d
 }
 
-func (d *dioContainer) ProvideOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
+func (d *dioContainer) ProvideOnProperty(prototype any, property string, compareValue string, caseSensitive ...bool) core.Dio {
 	return d.ProvideNamedBeanOnProperty("", prototype, property, compareValue, caseSensitive...)
 }
 
-func (d *dioContainer) ProvideMultiBeanOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
+func (d *dioContainer) ProvideMultiBeanOnProperty(beans []any, property string, compareValue string, caseSensitive ...bool) core.Dio {
 	for _, bean := range beans {
 		d.ProvideOnProperty(bean, property, compareValue, caseSensitive...)
 	}
 	return d
 }
 
-func (d *dioContainer) ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
+func (d *dioContainer) ProvideNamedBeanOnProperty(beanName string, prototype any, property string, compareValue string, caseSensitive ...bool) core.Dio {
 	return d.provideBeanCondition(beanName, prototype, property, compareValue, true, len(caseSensitive) > 0 && caseSensitive[0])
 }
 
-func (d *dioContainer) ProvideMultiNamedBeanOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
+func (d *dioContainer) ProvideMultiNamedBeanOnProperty(namedBeanMap map[string]any, property string, compareValue string, caseSensitive ...bool) core.Dio {
 	for name, bean := range namedBeanMap {
 		d.ProvideNamedBeanOnProperty(name, bean, property, compareValue, caseSensitive...)
 	}
 	return d
 }
 
-func (d *dioContainer) ProvideNotOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
+func (d *dioContainer) ProvideNotOnProperty(prototype any, property string, compareValue string, caseSensitive ...bool) core.Dio {
 	return d.ProvideNamedBeanNotOnProperty("", prototype, property, compareValue, caseSensitive...)
 }
 
-func (d *dioContainer) ProvideMultiBeanNotOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
+func (d *dioContainer) ProvideMultiBeanNotOnProperty(beans []any, property string, compareValue string, caseSensitive ...bool) core.Dio {
 	for _, bean := range beans {
 		d.ProvideNotOnProperty(bean, property, compareValue, caseSensitive...)
 	}
 	return d
 }
 
-func (d *dioContainer) ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
+func (d *dioContainer) ProvideNamedBeanNotOnProperty(beanName string, prototype any, property string, compareValue string, caseSensitive ...bool) core.Dio {
 	return d.provideBeanCondition(beanName, prototype, property, compareValue, false, len(caseSensitive) > 0 && caseSensitive[0])
 }
 
-func (d *dioContainer) ProvideMultiNamedBeanNotOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
+func (d *dioContainer) ProvideMultiNamedBeanNotOnProperty(namedBeanMap map[string]any, property string, compareValue string, caseSensitive ...bool) core.Dio {
 	for name, bean := range namedBeanMap {
 		d.ProvideNamedBeanNotOnProperty(name, bean, property, compareValue, caseSensitive...)
 	}
 	return d
 }
 
-func (d *dioContainer) GetBean(beanName string) (bean interface{}, ok bool) {
+func (d *dioContainer) GetBean(beanName string) (bean any, ok bool) {
 	return d.di.GetBean(beanName)
 }
 
-func (d *dioContainer) GetByType(beanType interface{}) (bean interface{}, ok bool) {
+func (d *dioContainer) GetByType(beanType any) (bean any, ok bool) {
 	return d.di.GetByType(beanType)
 }
 
-func (d *dioContainer) NewBean(beanType interface{}) (bean interface{}) {
+func (d *dioContainer) NewBean(beanType any) (bean any) {
 	return d.di.NewBean(beanType)
 }
 
-func (d *dioContainer) NewBeanByName(beanName string) (bean interface{}) {
+func (d *dioContainer) NewBeanByName(beanName string) (bean any) {
 	return d.di.NewBeanByName(beanName)
 }
 
@@ -333,7 +352,7 @@ func (d *dioContainer) LoadDefaultConfig(configs fs.FS, filename string) core.Di
 	if err != nil {
 		panic(err)
 	}
-	configMap := map[string]interface{}{}
+	configMap := map[string]any{}
 	if err := yaml.Unmarshal(data, &configMap); err != nil {
 		panic(err)
 	}
@@ -351,7 +370,7 @@ func (d *dioContainer) LoadConfig(configs fs.FS, filename string) core.Dio {
 	if err != nil {
 		panic(err)
 	}
-	configMap := map[string]interface{}{}
+	configMap := map[string]any{}
 	if err := yaml.Unmarshal(data, &configMap); err != nil {
 		panic(err)
 	}

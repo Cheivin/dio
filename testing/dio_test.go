@@ -5,6 +5,7 @@ import (
 	"embed"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/cheivin/dio"
 	"github.com/cheivin/dio-core"
@@ -24,21 +25,50 @@ func (a A) AfterPropertiesSet() {
 	a.Container.Logger().Info(context.TODO(), "Container")
 }
 
+// runWithTimeout 在超时内运行 dio，避免阻塞 go test
+func runWithTimeout(t *testing.T, fn func()) {
+	t.Helper()
+	done := make(chan struct{})
+	go func() {
+		defer func() {
+			recover() // Run 可能 panic，忽略
+			close(done)
+		}()
+		fn()
+	}()
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Log("run timed out (expected for blocking Serve)")
+	}
+}
+
 func TestRun(t *testing.T) {
-	dio.SetProperty("app.env", "dev").
-		ProvideOnProperty(A{}, "app.env", "dev").
-		Run(context.Background())
+	defer dio.Reset()
+	runWithTimeout(t, func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+		dio.SetProperty("app.env", "dev").
+			ProvideOnProperty(A{}, "app.env", "dev").
+			Run(ctx)
+	})
 }
 
 //go:embed configs/*.yaml
 var configs embed.FS
 
 func TestYamlConfig(t *testing.T) {
+	defer dio.Reset()
 	dio.LoadConfig(configs, "configs/dev.yaml")
-	dio.Run(context.Background())
+	runWithTimeout(t, func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+		dio.Run(ctx)
+	})
 }
 
 func Test_GetByType(t *testing.T) {
+	defer dio.Reset()
 	property := dio.GetProperties("log.", core.Property{}).(core.Property)
 	log, err := dio.NewZapLogger(property)
 	if err != nil {

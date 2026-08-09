@@ -166,7 +166,7 @@ func (l *ZapLogger) Skip(skip int) (logger core.Log) {
 	return
 }
 
-func (l *ZapLogger) Logger() interface{} {
+func (l *ZapLogger) Logger() any {
 	return l.logger.Desugar()
 }
 
@@ -191,7 +191,7 @@ func (l *ZapLogger) TraceWith(ctx context.Context, val any) context.Context {
 	return ctx
 }
 
-func (l *ZapLogger) map2slice(keyAndValues ...map[string]interface{}) (fields []interface{}) {
+func (l *ZapLogger) map2slice(keyAndValues ...map[string]any) (fields []any) {
 	if len(keyAndValues) == 0 {
 		return nil
 	}
@@ -203,34 +203,34 @@ func (l *ZapLogger) map2slice(keyAndValues ...map[string]interface{}) (fields []
 	return
 }
 
-func (l *ZapLogger) Debug(ctx context.Context, msg string, keyAndValues ...interface{}) {
+func (l *ZapLogger) Debug(ctx context.Context, msg string, keyAndValues ...any) {
 	l.logger.Named(l.getTraceId(ctx)).With(keyAndValues...).Debug(msg)
 }
 
-func (l *ZapLogger) Info(ctx context.Context, msg string, keyAndValues ...interface{}) {
+func (l *ZapLogger) Info(ctx context.Context, msg string, keyAndValues ...any) {
 	l.logger.Named(l.getTraceId(ctx)).With(keyAndValues...).Info(msg)
 }
 
-func (l *ZapLogger) Warn(ctx context.Context, msg string, keyAndValues ...interface{}) {
+func (l *ZapLogger) Warn(ctx context.Context, msg string, keyAndValues ...any) {
 	l.logger.Named(l.getTraceId(ctx)).With(keyAndValues...).Warn(msg)
 }
 
-func (l *ZapLogger) Error(ctx context.Context, msg string, keyAndValues ...interface{}) {
+func (l *ZapLogger) Error(ctx context.Context, msg string, keyAndValues ...any) {
 	l.logger.Named(l.getTraceId(ctx)).With(keyAndValues...).Error(msg)
 }
 
-func (l *ZapLogger) Debugw(ctx context.Context, msg string, keyAndValues ...map[string]interface{}) {
+func (l *ZapLogger) Debugw(ctx context.Context, msg string, keyAndValues ...map[string]any) {
 	l.logger.Named(l.getTraceId(ctx)).With(l.map2slice(keyAndValues...)...).Debug(msg)
 }
 
-func (l *ZapLogger) Infow(ctx context.Context, msg string, keyAndValues ...map[string]interface{}) {
+func (l *ZapLogger) Infow(ctx context.Context, msg string, keyAndValues ...map[string]any) {
 	l.logger.Named(l.getTraceId(ctx)).With(l.map2slice(keyAndValues...)...).Info(msg)
 }
 
-func (l *ZapLogger) Warnw(ctx context.Context, msg string, keyAndValues ...map[string]interface{}) {
+func (l *ZapLogger) Warnw(ctx context.Context, msg string, keyAndValues ...map[string]any) {
 	l.logger.Named(l.getTraceId(ctx)).With(l.map2slice(keyAndValues...)...).Warn(msg)
 }
 
-func (l *ZapLogger) Errorw(ctx context.Context, msg string, keyAndValues ...map[string]interface{}) {
+func (l *ZapLogger) Errorw(ctx context.Context, msg string, keyAndValues ...map[string]any) {
 	l.logger.Named(l.getTraceId(ctx)).With(l.map2slice(keyAndValues...)...).Error(msg)
 }

@@ -3,122 +3,161 @@ package dio
 import (
 	"context"
 	"io/fs"
+	"sync"
 
+	"github.com/cheivin/di"
 	"github.com/cheivin/dio-core"
 )
 
-var g core.Dio
+var (
+	gMu sync.Mutex
+	g   core.Dio
+)
 
-func init() {
-	g = New()
+// container 懒初始化并返回全局容器实例。
+// 未调用任何全局函数前不创建容器，首次访问时创建。
+func container() core.Dio {
+	gMu.Lock()
+	defer gMu.Unlock()
+	if g == nil {
+		g = New()
+	}
+	return g
 }
 
-func SetDefaultProperty(key string, value interface{}) core.Dio {
-	return g.SetDefaultProperty(key, value)
+// Reset 将全局容器重置为未初始化状态（清空所有 bean 与配置，下次调用时懒创建）。
+// 仅用于测试隔离（全局容器有状态残留），生产代码不应调用。
+func Reset() {
+	gMu.Lock()
+	defer gMu.Unlock()
+	g = nil
 }
 
-func SetDefaultPropertyMap(properties map[string]interface{}) core.Dio {
-	return g.SetDefaultPropertyMap(properties)
+func SetDefaultProperty(key string, value any) core.Dio {
+	return container().SetDefaultProperty(key, value)
 }
 
-func SetProperty(key string, value interface{}) core.Dio {
-	return g.SetProperty(key, value)
+func SetDefaultPropertyMap(properties map[string]any) core.Dio {
+	return container().SetDefaultPropertyMap(properties)
+}
+
+func SetProperty(key string, value any) core.Dio {
+	return container().SetProperty(key, value)
 }
 
 func GetPropertyString(key string) string {
-	return g.GetPropertyString(key)
+	return container().GetPropertyString(key)
 }
 
-func GetProperties(prefix string, destType interface{}) interface{} {
-	return g.GetProperties(prefix, destType)
+func GetProperties(prefix string, destType any) any {
+	return container().GetProperties(prefix, destType)
 }
 
-func SetPropertyMap(properties map[string]interface{}) core.Dio {
-	return g.SetPropertyMap(properties)
+func SetPropertyMap(properties map[string]any) core.Dio {
+	return container().SetPropertyMap(properties)
 }
 
 func AutoMigrateEnv() core.Dio {
-	return g.AutoMigrateEnv()
+	return container().AutoMigrateEnv()
 }
 
 func SetLogger(log core.Log) core.Dio {
-	return g.SetLogger(log)
+	return container().SetLogger(log)
 }
 
 func Logger() core.Log {
-	return g.Logger()
+	return container().Logger()
 }
 
-func RegisterBean(bean interface{}) core.Dio {
-	return g.RegisterBean(bean)
+func RegisterBean(bean any) core.Dio {
+	return container().RegisterBean(bean)
 }
 
-func RegisterNamedBean(name string, bean interface{}) core.Dio {
-	return g.RegisterNamedBean(name, bean)
+func RegisterNamedBean(name string, bean any) core.Dio {
+	return container().RegisterNamedBean(name, bean)
 }
 
-func Provide(prototype ...interface{}) core.Dio {
-	return g.Provide(prototype...)
+func Provide(prototype ...any) core.Dio {
+	return container().Provide(prototype...)
 }
 
-func ProvideNamedBean(beanName string, prototype interface{}) core.Dio {
-	return g.ProvideNamedBean(beanName, prototype)
+func ProvideNamedBean(beanName string, prototype any) core.Dio {
+	return container().ProvideNamedBean(beanName, prototype)
 }
 
-func ProvideMultiNamedBean(namedBeanMap map[string]interface{}) core.Dio {
-	return g.ProvideMultiNamedBean(namedBeanMap)
+func ProvideMultiNamedBean(namedBeanMap map[string]any) core.Dio {
+	return container().ProvideMultiNamedBean(namedBeanMap)
 }
 
-func ProvideOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
-	return g.ProvideOnProperty(prototype, property, compareValue, caseSensitive...)
+func ProvideFunc(fn any) core.Dio {
+	return container().ProvideFunc(fn)
 }
 
-func ProvideNamedBeanOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
-	return g.ProvideNamedBeanOnProperty(beanName, prototype, property, compareValue, caseSensitive...)
+// WithCircularCheck 开启/关闭循环依赖检测（默认关闭）
+func WithCircularCheck(enable bool) core.Dio {
+	return container().WithCircularCheck(enable)
 }
 
-func ProvideMultiBeanOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
-	return g.ProvideMultiBeanOnProperty(beans, property, compareValue, caseSensitive...)
-}
-func ProvideMultiNamedBeanOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
-	return g.ProvideMultiNamedBeanOnProperty(namedBeanMap, property, compareValue, caseSensitive...)
-}
-
-func ProvideNotOnProperty(prototype interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
-	return g.ProvideNotOnProperty(prototype, property, compareValue, caseSensitive...)
-}
-
-func ProvideNamedBeanNotOnProperty(beanName string, prototype interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
-	return g.ProvideNamedBeanNotOnProperty(beanName, prototype, property, compareValue, caseSensitive...)
+// WithBeanSelector 设置接口多实现时的选择策略。
+// 需要引入 github.com/cheivin/di 包的 BeanSelector 类型，故以独立函数提供。
+func WithBeanSelector(s di.BeanSelector) core.Dio {
+	c := container()
+	if dc, ok := c.(*dioContainer); ok {
+		dc.WithBeanSelector(s)
+	}
+	return c
 }
 
-func ProvideMultiBeanNotOnProperty(beans []interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
-	return g.ProvideMultiBeanNotOnProperty(beans, property, compareValue, caseSensitive...)
-}
-func ProvideMultiNamedBeanNotOnProperty(namedBeanMap map[string]interface{}, property string, compareValue string, caseSensitive ...bool) core.Dio {
-	return g.ProvideMultiNamedBeanNotOnProperty(namedBeanMap, property, compareValue, caseSensitive...)
+func ProvideOnProperty(prototype any, property string, compareValue string, caseSensitive ...bool) core.Dio {
+	return container().ProvideOnProperty(prototype, property, compareValue, caseSensitive...)
 }
 
-func GetBean(beanName string) (bean interface{}, ok bool) {
-	return g.GetBean(beanName)
+func ProvideNamedBeanOnProperty(beanName string, prototype any, property string, compareValue string, caseSensitive ...bool) core.Dio {
+	return container().ProvideNamedBeanOnProperty(beanName, prototype, property, compareValue, caseSensitive...)
 }
 
-func GetByType(beanType interface{}) (bean interface{}, ok bool) {
-	return g.GetByType(beanType)
+func ProvideMultiBeanOnProperty(beans []any, property string, compareValue string, caseSensitive ...bool) core.Dio {
+	return container().ProvideMultiBeanOnProperty(beans, property, compareValue, caseSensitive...)
+}
+func ProvideMultiNamedBeanOnProperty(namedBeanMap map[string]any, property string, compareValue string, caseSensitive ...bool) core.Dio {
+	return container().ProvideMultiNamedBeanOnProperty(namedBeanMap, property, compareValue, caseSensitive...)
+}
+
+func ProvideNotOnProperty(prototype any, property string, compareValue string, caseSensitive ...bool) core.Dio {
+	return container().ProvideNotOnProperty(prototype, property, compareValue, caseSensitive...)
+}
+
+func ProvideNamedBeanNotOnProperty(beanName string, prototype any, property string, compareValue string, caseSensitive ...bool) core.Dio {
+	return container().ProvideNamedBeanNotOnProperty(beanName, prototype, property, compareValue, caseSensitive...)
+}
+
+func ProvideMultiBeanNotOnProperty(beans []any, property string, compareValue string, caseSensitive ...bool) core.Dio {
+	return container().ProvideMultiBeanNotOnProperty(beans, property, compareValue, caseSensitive...)
+}
+func ProvideMultiNamedBeanNotOnProperty(namedBeanMap map[string]any, property string, compareValue string, caseSensitive ...bool) core.Dio {
+	return container().ProvideMultiNamedBeanNotOnProperty(namedBeanMap, property, compareValue, caseSensitive...)
+}
+
+func GetBean(beanName string) (bean any, ok bool) {
+	return container().GetBean(beanName)
+}
+
+func GetByType(beanType any) (bean any, ok bool) {
+	return container().GetByType(beanType)
 }
 
 func Run(ctx context.Context) {
-	g.Run(ctx)
+	container().Run(ctx)
 }
 
 func Use(plugins ...core.PluginConfig) core.Dio {
-	return g.Use(plugins...)
+	return container().Use(plugins...)
 }
 
 func LoadDefaultConfig(configs fs.FS, filename string) core.Dio {
-	return g.LoadDefaultConfig(configs, filename)
+	return container().LoadDefaultConfig(configs, filename)
 }
 
 func LoadConfig(configs fs.FS, filename string) core.Dio {
-	return g.LoadConfig(configs, filename)
+	return container().LoadConfig(configs, filename)
 }

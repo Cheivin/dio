@@ -3,7 +3,6 @@ package dio
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/cheivin/di"
 	"github.com/cheivin/dio-core"
@@ -24,8 +23,8 @@ func (e emptyLogger) Info(s string) {
 func (e emptyLogger) Warn(s string) {
 }
 
-func (e emptyLogger) Fatal(s string) {
-	panic(s)
+func (e emptyLogger) Fatal(err error) {
+	panic(err)
 }
 
 type dioLogger struct {
@@ -56,7 +55,7 @@ func (d dioLogger) Warn(s string) {
 	d.log.Warn(context.Background(), s)
 }
 
-func (d dioLogger) Fatal(s string) {
-	d.log.Error(context.Background(), s)
-	os.Exit(1)
+func (d dioLogger) Fatal(err error) {
+	d.log.Error(context.Background(), err.Error())
+	panic(err)
 }

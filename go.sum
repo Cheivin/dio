@@ -1,7 +1,7 @@
-github.com/cheivin/di v0.3.0 h1:HAOvZgrHr9s8Zz2H6h1W6KD+t4ZATEYN11F3e02PJtk=
-github.com/cheivin/di v0.3.0/go.mod h1:voTyV9igzcZWdAYClqRVNN3VllGHp43fyot2wa97aJY=
-github.com/cheivin/dio-core v0.1.0 h1:SrCpsXId/MnD7HtltSiS7JqGFYxdD8b965tLMlSr6ho=
-github.com/cheivin/dio-core v0.1.0/go.mod h1:NwTTVHR06imkuq41zum5T1x/+uXAM54vD/q8fTIct/0=
+github.com/cheivin/di v0.6.1 h1:gXA/DsojuVU5716qFmwA5aMD2yzNUR6AMrMbf/KSaqw=
+github.com/cheivin/di v0.6.1/go.mod h1:UEwHPHUjEPDBhIEh50ifrn+GDyblmP5HUnBrUjkhApM=
+github.com/cheivin/dio-core v0.2.0 h1:w21ENZSJ9taKzN3o5os5K2V2K8pPnf8x/V5wrriGEMQ=
+github.com/cheivin/dio-core v0.2.0/go.mod h1:8Km07YDz3QlrwMdmLh9aTA03d0GzMHP04z8U0qMEyKM=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
