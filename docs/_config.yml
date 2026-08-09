@@ -1,0 +1,23 @@
+title: dio 文档
+description: Go 应用层框架 dio 的官方文档
+theme: jekyll-theme-cayman
+lang: zh-CN
+baseurl: "/dio"
+url: "https://cheivin.github.io"
+
+plugins:
+  - jekyll-readme-index
+
+readme_index:
+  enabled: true
+  remove_originals: true
+
+exclude:
+  - testing
+
+defaults:
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: default
